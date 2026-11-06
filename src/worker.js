@@ -191,6 +191,10 @@ export class Gate extends DurableObject {
     return { login: !!tok, refreshed_at: tok && tok.refreshed_at, etsy: check, orders, devices, unverified };
   }
 
+  async grant(order, listings) {  // a test order for the shop owner: opens these listings without asking Etsy
+    await this.ctx.storage.put("r:" + order, { listings: listings.map(String), devices: [], at: Date.now(), test: true });
+  }
+
   async reset(order) {
     await this.ctx.storage.delete("r:" + order);
     await this.ctx.storage.delete("u:" + order);
@@ -205,6 +209,11 @@ async function admin(req, env, url) {
   if (url.pathname === "/__admin/token" && req.method === "POST") {
     const t = await req.json();
     await g.setToken({ access_token: t.access_token, refresh_token: t.refresh_token, expires_at: t.expires_at });
+  } else if (url.pathname === "/__admin/grant" && req.method === "POST") {
+    const b = await req.json();
+    const order = String(b.order || "").replace(/[^0-9]/g, "");
+    if (order.length < 6 || !Array.isArray(b.listings) || !b.listings.length) return new Response("bad", { status: 400 });
+    await g.grant(order, b.listings);
   } else if (url.pathname === "/__admin/reset" && req.method === "POST") {
     await g.reset(String((await req.json()).order || ""));
   } else if (url.pathname !== "/__admin/status") return new Response("?", { status: 404 });
