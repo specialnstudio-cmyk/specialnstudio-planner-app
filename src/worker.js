@@ -3,7 +3,7 @@
 // Static files are served from the repo (assets). Apps listed in PRODUCTS open only for a browser that holds an
 // activation cookie; to get one the buyer types their Etsy order number, which is looked up with the Etsy API
 // (the receipt must contain one of the app's listings). Each order can activate MAX_DEVICES browsers.
-// Apps not in PRODUCTS are served without a check.
+// Every app folder is protected; one without a listing in PRODUCTS cannot be activated yet.
 //
 // Secrets (set by the "Planlayıcı uygulama koruması" workflow in specialnstudio1): ETSY_API_KEY, ETSY_SHARED_SECRET,
 // COOKIE_SECRET, ADMIN_SECRET. The Etsy login itself (rotating refresh token) lives in the Gate Durable Object,
@@ -11,6 +11,8 @@
 import { DurableObject } from "cloudflare:workers";
 
 const BASE = "/p/a4c9eafbf1/";
+// Every app folder under BASE is protected. An app opens with an order of one of its listings;
+// an app with no listing yet cannot be activated (add its listing id here when the listing goes up).
 const PRODUCTS = {  // app folder → Etsy listing ids that unlock it
   "plum-en-mon": ["4611085973"],
   "plum-en-sun": ["4611085973"],
@@ -28,7 +30,7 @@ export default {
     if (url.pathname.startsWith("/__admin/")) return admin(req, env, url);
     const m = url.pathname.startsWith(BASE) && url.pathname.slice(BASE.length).match(/^([a-z0-9-]+)(\/.*)?$/);
     const app = m && m[1];
-    if (!app || !PRODUCTS[app] || OPEN_FILES.test(url.pathname)) return env.ASSETS.fetch(req);
+    if (!app || OPEN_FILES.test(url.pathname)) return env.ASSETS.fetch(req);
     const rest = m[2] || "";
     if (!env.COOKIE_SECRET) return new Response("Planner is being set up. Please try again later.", { status: 503, headers: { "cache-control": "no-store" } });
     if (rest === "") return Response.redirect(`${url.origin}${BASE}${app}/${url.search}${url.hash}`, 301);
@@ -54,7 +56,7 @@ async function allowed(req, env, app) {
   const jar = Object.fromEntries((req.headers.get("cookie") || "").split(/;\s*/).filter(Boolean).map(c => {
     const i = c.indexOf("="); return [c.slice(0, i), c.slice(i + 1)];
   }));
-  for (const listing of PRODUCTS[app]) {
+  for (const listing of PRODUCTS[app] || []) {
     const v = jar["pl_" + listing];
     if (!v) continue;
     const [rid, dev, sig] = v.split(".");
@@ -68,6 +70,7 @@ async function activate(req, env, app) {
   const form = await req.formData();
   const order = String(form.get("order") || "").replace(/[^0-9]/g, "");
   if (order.length < 6 || order.length > 14) return page(app, "format", 400);
+  if (!(PRODUCTS[app] || []).length) return page(app, "other", 403, order);
   const dev = crypto.randomUUID().replace(/-/g, "").slice(0, 16);
   const res = await gate(env).verify(order, PRODUCTS[app], dev);
   if (!res.ok) return page(app, res.reason, 403, order);
