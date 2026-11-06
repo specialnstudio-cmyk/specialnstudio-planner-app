@@ -238,6 +238,22 @@ function esc(s) {
   return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 }
 
+// The activation page wears the look of the app it opens (Plum Noir is the default).
+const GF = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@900&family=Caveat+Brush&family=Space+Grotesk:wght@400;700&family=DM+Serif+Display&display=swap">';
+const FUN = (bg, title, font, btn, extra = "") => `${GF}<style>html,body{background:${bg}!important;font-family:"Space Grotesk",sans-serif!important}
+.card{background:#FFF6E9!important;border:4px solid #2A1630!important;border-radius:28px!important;box-shadow:8px 8px 0 #2A1630!important}
+h1{font-family:${font}!important;color:${title}!important;letter-spacing:.01em!important;font-size:40px!important;line-height:1!important}
+label{font-family:"Space Grotesk",sans-serif!important;font-weight:700;color:#2A1630!important;letter-spacing:.08em!important}
+input{border:3px solid #2A1630!important}
+button{font-family:"Space Grotesk",sans-serif!important;font-weight:700;background:${btn}!important;color:#fff!important;border:3px solid #2A1630!important;box-shadow:4px 4px 0 #2A1630}
+.help{color:#5A4560!important}${extra}</style>`;
+const THEME = {
+  energy: FUN("#FFAD68", "#FF5A36", '"Big Shoulders Display",sans-serif', "#FF3E8A", "h1{text-transform:uppercase;font-size:46px!important}"),
+  leopard: FUN("#FFAD68", "#E8402A", '"DM Serif Display",serif', "#E8402A", "h1{text-transform:uppercase}"),
+  zebra: FUN("#F7E3CF", "#E5508F", '"Caveat Brush",cursive', "#E5508F", "h1{text-transform:none!important;font-size:46px!important}"),
+  poppy: FUN("#D2386C", "#8E003F", '"DM Serif Display",serif', "#EA582A", "h1{text-transform:uppercase}"),
+};
+
 function page(app, reason, status, order = "") {
   const L = T[app.split("-")[1] === "tr" ? "tr" : "en"];
   const err = reason ? `<p class="err">${esc(L.err[reason] || L.err.notfound)}</p>` : "";
@@ -259,7 +275,7 @@ input:focus{outline:none;border-color:#3A1A28;box-shadow:0 0 0 3px rgba(176,141,
 button{margin-top:16px;width:100%;font-family:Italiana,serif;letter-spacing:.16em;text-transform:uppercase;font-size:17px;padding:14px;border:0;border-radius:99px;background:#3A1A28;color:#E7D3A8;cursor:pointer}
 .help{font-size:14.5px;line-height:1.45;color:#7A5A66;margin:18px 0 0}
 .err{background:#F6E3E6;border:1px solid #C77D93;color:#6B1F38;border-radius:10px;padding:10px 12px;font-size:16px;margin:0 0 14px}
-</style></head><body><form class="card" method="post" action="__activate">
+</style>${THEME[app.split("-")[0]] || ""}</head><body><form class="card" method="post" action="__activate">
 <h1>${esc(L.title)}</h1><p class="lead">${esc(L.lead)}</p>${err}
 <label for="o">${esc(L.label)}</label><input id="o" name="order" inputmode="numeric" autocomplete="off" required placeholder="${esc(L.ph)}" value="${esc(order)}">
 <button>${esc(L.btn)} ›</button><p class="help">${esc(L.help)}</p></form></body></html>`;
