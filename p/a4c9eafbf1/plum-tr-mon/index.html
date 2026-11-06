@@ -1,0 +1,358 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Plum Noir"><meta name="theme-color" content="#3A1A28">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-512.png">
+<title>Plum Noir 2027 Planlayıcı</title><link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Caveat+Brush&family=Space+Grotesk:wght@400;500;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"><style id="lcss"></style>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#3A1A28;-webkit-text-size-adjust:100%}
+#stage{position:absolute;left:0;top:0;transform-origin:0 0}
+#stage>.art{position:absolute;left:0;top:0;pointer-events:none}
+#stage>.page{position:absolute;left:0;top:0}
+#stage input,#stage textarea{position:absolute;margin:0;padding:0 2px;border:0;outline:0;background:transparent;
+  font-family:'Crimson Pro',serif;color:#2A1630;resize:none;border-radius:4px}
+#stage input:focus,#stage textarea:focus{background:rgba(255,201,60,.18)}
+#stage input[type=checkbox]{-webkit-appearance:none;appearance:none;cursor:pointer}
+#stage input[type=checkbox]:checked::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-weight:700;color:#2A1630}
+#mbtn{position:fixed;z-index:5;left:calc(env(safe-area-inset-left) + 6px);bottom:calc(env(safe-area-inset-bottom) + 6px);
+  width:30px;height:30px;border-radius:50%;border:0;background:rgba(42,22,48,.55);color:#fff;font:700 16px sans-serif}
+#menu{position:fixed;z-index:6;inset:0;background:rgba(42,22,48,.45);display:none;align-items:center;justify-content:center}
+#menu div{background:#FFF6E9;color:#2A1630;border-radius:18px;padding:22px;max-width:340px;margin:16px;
+  font:16px/1.4 -apple-system,system-ui,sans-serif;text-align:center}
+#menu button{display:block;width:100%;margin-top:10px;padding:12px;border-radius:12px;border:2px solid #2A1630;
+  background:#fff;font:700 16px -apple-system,system-ui,sans-serif;color:#2A1630}
+#hint{position:fixed;z-index:4;left:50%;bottom:calc(env(safe-area-inset-bottom) + 48px);transform:translateX(-50%);
+  background:rgba(42,22,48,.85);color:#fff;padding:10px 16px;border-radius:20px;font:600 15px -apple-system,system-ui,sans-serif;
+  white-space:nowrap;transition:opacity .6s;pointer-events:none}
+#nbar{position:fixed;z-index:5;right:calc(env(safe-area-inset-right) + 8px);bottom:calc(env(safe-area-inset-bottom) + 64px);
+  display:flex;align-items:center;gap:4px;background:rgba(42,22,48,.8);border-radius:20px;padding:3px;color:#fff;
+  font:700 14px -apple-system,system-ui,sans-serif}
+#nbar span{padding:0 6px}
+#nbar button{border:0;background:#fff;color:#2A1630;border-radius:50%;width:30px;height:30px;font:700 17px sans-serif}
+#nbar button:disabled{opacity:.35}
+#nbar span{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline dotted}
+#nlist{position:fixed;z-index:7;inset:0;background:rgba(42,22,48,.45);display:none;align-items:center;justify-content:center}
+#nlist>div{box-sizing:border-box;overflow-x:hidden;background:#FFF6E9;color:#2A1630;border-radius:18px;padding:18px;width:min(420px,calc(100vw - 32px));max-height:80vh;overflow:auto;
+  font:16px -apple-system,system-ui,sans-serif}
+#nlist h3{margin:0 0 10px}
+#nlist label{display:block;margin:8px 0;font-weight:600}
+#nlist label select,#nlist label input{display:block;width:100%;box-sizing:border-box;margin-top:4px;padding:10px;border:2px solid #2A1630;border-radius:10px;
+  font:16px -apple-system,system-ui,sans-serif;background:#fff;color:#2A1630;max-width:100%;min-width:0}
+#nlist label input[type=date]{-webkit-appearance:none;appearance:none;min-height:46px;text-align:left;line-height:24px}
+#nlist label input[type=date]::-webkit-date-and-time-value{text-align:left}
+#nlist .nr{display:flex;align-items:center;gap:8px;margin:6px 0}
+#nlist .nr.on input{border-color:#8A5A3C;box-shadow:3px 3px 0 #8A5A3C}
+#nlist .nr b{width:24px;text-align:right}
+#nlist input{flex:1;min-width:0;padding:9px 10px;border:2px solid #2A1630;border-radius:10px;font:16px -apple-system,system-ui,sans-serif}
+#nlist .nr button{width:40px;height:40px;border-radius:10px;border:2px solid #2A1630;background:#fff;font:700 18px sans-serif;color:#2A1630}
+#nlist>div>button{display:block;width:100%;margin-top:10px;padding:12px;border-radius:12px;border:2px solid #2A1630;background:#fff;
+  font:700 16px -apple-system,system-ui,sans-serif;color:#2A1630}
+#stage .px{position:absolute;right:6%;top:6%;width:34px;height:34px;border-radius:50%;border:2px solid #2A1630;background:#fff;
+  color:#2A1630;font:700 20px sans-serif;display:flex;align-items:center;justify-content:center;padding:0}
+#stage .px.plus{right:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;opacity:.55;pointer-events:none}
+/* dialogs: calm cream card, one pink accent, the planner's display font for the title */
+#menu,#nlist{background:rgba(42,22,48,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#menu>div,#nlist>div{box-sizing:border-box;border:2px solid #8A5A3C;border-radius:24px;box-shadow:0 18px 40px rgba(42,22,48,.35);
+  padding:24px 22px 18px;background:#FAF5EE;font-family:'Crimson Pro',serif;color:#2A1630}
+#menu h3,#nlist h3{margin:0 0 14px;font:900 32px/1 'Italiana',serif;text-transform:uppercase;letter-spacing:.01em;color:#8A5A3C}
+#nlist label{font:700 11.5px 'Crimson Pro',serif;text-transform:uppercase;letter-spacing:.14em;color:#7A6488;margin:14px 0 6px}
+#nlist label select,#nlist label input,#nlist input{border:1.5px solid #E6D9EE;border-radius:14px;box-shadow:none;background:#fff;
+  font:500 17px 'Crimson Pro',serif;text-transform:none;letter-spacing:0;padding:12px 14px;color:#2A1630}
+#nlist input:focus,#nlist select:focus{outline:none;border-color:#8A5A3C;box-shadow:0 0 0 3px rgba(255,62,138,.15)}
+#nlist p{font:20px/1.2 'Instrument Serif',serif;color:#7A5A66;margin:14px 0 4px}
+#menu p{font:500 15px/1.5 'Crimson Pro',serif;color:#4A3858;text-align:left;margin:0 0 6px}
+#nlist>div>button,#menu button{border:0;border-radius:16px;box-shadow:none;margin-top:10px;padding:14px;
+  font:700 16px 'Crimson Pro',serif;letter-spacing:.01em;color:#2A1630;background:#F3E9F7}
+#nlist>div>button:active,#menu button:active,#nlist .nr button:active{transform:scale(.98)}
+#nlist button:focus,#menu button:focus{outline:none}
+#nlist button[data-apple],#menu #bload{background:#E6D2D8}
+#nlist button[data-google],#menu #bsave{background:#E7D3A8}
+#nlist button[data-new]{background:#8A5A3C;color:#fff}
+#nlist button[data-close],#menu #bclose{background:none;color:#7A6488;margin-top:4px;padding:10px}
+#nlist .nr b{font:900 20px 'Italiana',serif;color:#8A5A3C}
+#nlist .nr button{border:0;border-radius:12px;box-shadow:none;background:#E7D3A8;color:#2A1630}
+#nlist .nr.on input{border-color:#8A5A3C;box-shadow:none}
+#stage .appmenu{margin-left:auto;align-self:center;flex:none;font-family:'Crimson Pro',serif;font-size:15px;padding:9px 16px;
+  background:#E7D3A8;cursor:pointer}
+#wait{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font:16px sans-serif;color:#fff}
+</style></head><body>
+<div id="stage"></div><div id="nlist"></div><div id="wait">Yükleniyor…</div>
+<div id="menu"><div><h3>Yedek & Yardım</h3><p>Sayfa çevirmek için sola ya da sağa kaydır (bilgisayarda ok tuşları). Boyamak için kareye, daireye ya da damlaya dokun. Not sayfalarında + yeni sayfa ekler; sayfalarına isim vermek ve birine gitmek için sayfa numarasına dokun. Vision board'da ve kitaplıkta fotoğraf eklemek için bir çerçeveye ya da kitaba dokun. Planlayıcın sadece bu cihazda kayıtlı. Başka bir telefona, tablete ya da bilgisayara taşımak için burada yedeği kaydet, orada geri yükle.</p><button id="bsave">Yedeği kaydet</button><button id="bload">Yedeği geri yükle</button>
+<button id="bclose">Kapat</button><input id="file" type="file" accept=".json,application/json" hidden></div></div>
+<script>
+const APP = {"key": "plum-noir-2027-tr-mon", "chunk": 24, "home": "cover", "file": "planner-backup-plum-noir-2027-tr-mon", "year": 2027, "layouts": ["phone", "portrait", "landscape"], "notes": ["t-dot", "t-lined", "t-grid", "t-blank", "t-cornell", "t-brain"], "box": ".blk,.tbl,.fld,.fl,.bd,.corn-c,.corn-n,.nt,.goalrow,.hr,.hh,.wd,.trk", "label": ".lbl,.fl-m,.fld-l,.tb-h,.wd-l,.wd-n,.gnum,.hr-n,.trk-l", "cells": ".tb-c, .fld-v, .wy-line", "areas": ".ruled, .note-box:not(:has(.ln))"}, T = {"menu": "Yedek & Yardım", "what": "Ne yapmak istersin?", "bday": "Doğum günü ekle", "bname": "İsim", "bdate": "Tarih", "badd": "Apple Takvim'e ekle", "bgoogle": "Google Takvim'e ekle", "bnote": "Başladığında hatırlatma gelir.", "rem": "Hatırlatma ekle", "brep": "Tekrar", "freq": ["Hiç", "Her gün", "Her hafta", "Her ay", "Her yıl"], "btitle": "🎂 ", "unphoto": "Bu fotoğraf kaldırılsın mı? (Vazgeç yeni bir fotoğraf seçer.)", "full": "Bu cihazdaki planlayıcı alanı doldu. Birkaç fotoğrafı çıkar, sonra bir yedek kaydet.", "page": "Sayfa", "pages": "Sayfalar", "newpage": "Yeni sayfa", "save": "Yedeği kaydet", "load": "Yedeği geri yükle", "close": "Kapat", "saved": "Yedek kaydedildi. Dosyayı güvenli bir yerde sakla (Dosyalar, iCloud Drive, Google Drive).", "loaded": "Yedek geri yüklendi.", "bad": "Bu dosya bir planlayıcı yedeği değil.", "hint": "Sayfa çevirmek için sola ya da sağa kaydır", "note": "Sayfa çevirmek için sola ya da sağa kaydır (bilgisayarda ok tuşları). Boyamak için kareye, daireye ya da damlaya dokun. Not sayfalarında + yeni sayfa ekler; sayfalarına isim vermek ve birine gitmek için sayfa numarasına dokun. Vision board'da ve kitaplıkta fotoğraf eklemek için bir çerçeveye ya da kitaba dokun. Planlayıcın sadece bu cihazda kayıtlı. Başka bir telefona, tablete ya da bilgisayara taşımak için burada yedeği kaydet, orada geri yükle.", "loading": "Yükleniyor…"}, KEY = APP.key, stage = document.getElementById('stage');
+let data = {}; try { data = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
+let layout = null, meta = null, cur = null, scale = 1;
+const files = {};
+let ff = null;  // gzip reader for browsers without DecompressionStream (older iPhones)
+const gunzip = async buf => {
+  if ('DecompressionStream' in window) return new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+  if (!ff) ff = new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'fflate.js'; s.onload = () => ok(window.fflate); s.onerror = no; document.head.appendChild(s); });
+  const f = await ff; return f.strFromU8(f.gunzipSync(new Uint8Array(buf)));
+};
+const get = (u, kind) => files[u] || (files[u] = fetch(u).then(async r => { if (!r.ok) throw u;
+  const t = u.endsWith('.gz') ? await gunzip(await r.arrayBuffer()) : await r.text(); return kind === 'json' ? JSON.parse(t) : t; }));
+const pick = () => { const r = innerWidth / innerHeight, l = r < .62 ? 'phone' : r < 1.08 ? 'portrait' : 'landscape';
+  return APP.layouts.includes(l) ? l : 'portrait'; };
+let warned = false;
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { if (!warned) { warned = true; alert(T.full); } } };
+
+function fill(root) {  // the writing lines, dots and grids (same drawing as the PDF)
+  root.querySelectorAll('[data-fill]').forEach(el => {
+    const kind = el.dataset.fill, g = +(el.dataset.gap || (kind === 'lines' ? 32 : 26));
+    const w = el.clientWidth, h = el.clientHeight; if (!w || !h) return;
+    let d = '', sw = 1.6, col = 'rgba(42,22,48,.22)', cap = 'butt';
+    if (kind === 'lines') { for (let y = g; y < h - 4; y += g) d += `M10 ${y}H${w - 10}`; }
+    if (kind === 'grid') { col = 'rgba(42,22,48,.13)'; sw = 1.1;
+      for (let y = g; y < h; y += g) d += `M0 ${y}H${w}`; for (let x = g; x < w; x += g) d += `M${x} 0V${h}`; }
+    if (kind === 'dots') { sw = 3; cap = 'round'; col = 'rgba(42,22,48,.32)';
+      for (let y = g; y < h - 2; y += g) for (let x = g; x < w - 2; x += g) d += `M${x} ${y}h0`; }
+    el.insertAdjacentHTML('afterbegin', `<svg width="${w}" height="${h}" style="position:absolute;left:0;top:0">` +
+      `<path d="${d}" stroke="${col}" stroke-width="${sw}" stroke-linecap="${cap}" fill="none"/></svg>`);
+  });
+}
+
+function fields(pg, pid) {  // text boxes and check boxes over every writing line, keyed by box label so layouts share them
+  const P = pg.getBoundingClientRect(), out = [], count = {}, boxes = new Map();
+  const box = el => { const b = el.closest(APP.box || '.bx,.tbl,.field,.area,.row,.col') || pg;
+    if (!boxes.has(b)) { const c = b.querySelector(APP.label || '.chip,.label,b,a'); boxes.set(b, ((c && c.textContent) || 'x' + boxes.size).trim().slice(0, 24)); }
+    return boxes.get(b); };
+  const add = (el, t, x, y, w, h) => { if (w / scale < 18 || h / scale < 10) return;  /* too small to tap */ const b = box(el), k = `${b}|${t}`;
+    count[k] = (count[k] || 0) + 1; out.push({t, x: (x - P.left) / scale, y: (y - P.top) / scale, w: w / scale, h: h / scale,
+      key: `${pid}|${k}${count[k]}`}); };
+  const after = (el, r) => { let x = r.left + 6 * scale;
+    el.querySelectorAll('b,span,.box,svg').forEach(c => { const q = c.getBoundingClientRect();
+      if (q.width && q.left < r.left + r.width * .5) x = Math.max(x, q.right + 8 * scale); }); return x; };
+  pg.querySelectorAll('.box').forEach(b => { const r = b.getBoundingClientRect(); add(b, 'c', r.left, r.top, r.width, r.height); });
+  pg.querySelectorAll('.ln,.field,[data-ln]').forEach(el => { const r = el.getBoundingClientRect(), x = after(el, r);
+    let right = r.right - 4 * scale; el.querySelectorAll('.plus').forEach(c => right = Math.min(right, c.getBoundingClientRect().left - 6 * scale));
+    add(el, 't', x, r.top + 2 * scale, right - x, r.height - 4 * scale); });
+  pg.querySelectorAll(APP.cells || '.tbl .tr > div').forEach(el => { if (el.querySelector('b') || el.textContent.trim()) return; const r = el.getBoundingClientRect();
+    add(el, 't', r.left + 4 * scale, r.top + scale, r.width - 8 * scale, r.height - 2 * scale); });
+  pg.querySelectorAll('[data-blank]').forEach(el => { const r = el.getBoundingClientRect();  // a whole note page
+    add(el, 'm', r.left + 8 * scale, r.top + 8 * scale, r.width - 16 * scale, r.height - 16 * scale); });
+  pg.querySelectorAll(APP.areas || '.area').forEach(el => { if (el.children.length || el.textContent.trim()) return;  // an empty page area
+    const r = el.getBoundingClientRect(); add(el, 'm', r.left + 8 * scale, r.top + 8 * scale, r.width - 16 * scale, r.height - 16 * scale); });
+  pg.querySelectorAll('[data-fill]').forEach(el => { const r = el.getBoundingClientRect(); if (!r.width) return;
+    if (el.dataset.fill === 'lines') { const g = +(el.dataset.gap || 32) * scale;
+      for (let y = g; y < r.height - 4 * scale; y += g) add(el, 't', r.left + 10 * scale, r.top + y - g + 4 * scale, r.width - 20 * scale, g - 5 * scale);
+    } else add(el, 'm', r.left + 8 * scale, r.top + 8 * scale, r.width - 16 * scale, r.height - 16 * scale); });
+  for (const f of out) {
+    const el = document.createElement(f.t === 'm' ? 'textarea' : 'input');
+    el.type = f.t === 'c' ? 'checkbox' : 'text'; el.dataset.k = f.key;
+    Object.assign(el.style, {left: f.x + 'px', top: f.y + 'px', width: f.w + 'px', height: f.h + 'px',
+      fontSize: (f.t === 'm' ? 17 : Math.max(13, Math.min(18, f.h * .62))) + 'px'});
+    if (f.t === 'c') { el.checked = !!data[f.key]; el.onchange = () => { data[f.key] = el.checked || undefined; save(); }; }
+    else { el.value = data[f.key] || ''; el.oninput = () => { data[f.key] = el.value || undefined; save(); }; }
+    stage.appendChild(el);
+  }
+}
+
+function taps(pg, pid) {  // colouring pages: a tap gives a cell the next colour; mood picks one; stars rate
+  pg.querySelectorAll('[data-tap]').forEach((el, i) => {
+    const key = `${pid}|tap${i}`, mode = el.dataset.tap, one = el.children.length === 1 ? el.firstElementChild : null;
+    const svg = el.tagName.toLowerCase() === 'svg' ? el.querySelector('path,circle') :
+      one && one.tagName.toLowerCase() === 'svg' && mode !== 'star' ? one.querySelector('path,circle') : null;
+    const orig = svg ? svg.getAttribute('fill') : el.style.background, origColor = el.style.color;
+    const paint = () => { const v = data[key] || 0;
+      if (mode === 'one') { el.style.boxShadow = v ? '0 0 0 3px #fff, 0 0 0 6px #2A1630' : ''; el.style.transform = v ? 'scale(1.12)' : ''; }
+      else if (mode === 'star') { if (el.textContent.trim()) el.style.color = v ? origColor : '#fff'; else el.style.opacity = v ? 1 : .3; }
+      else { const c = v ? mode.split('|')[v - 1] : orig; if (svg) svg.setAttribute('fill', c); else el.style.background = c; } };
+    el._paint = paint; el.style.cursor = 'pointer'; paint();
+    el.addEventListener('click', e => { e.preventDefault(); e.stopPropagation();
+      const g = el.closest('[data-group]'), sib = g ? [...g.querySelectorAll('[data-tap]')] : [];
+      if (mode === 'one') { const on = !data[key]; sib.forEach(x => { data[x._key] = undefined; }); data[key] = on ? 1 : undefined; sib.forEach(x => x._paint()); }
+      else if (mode === 'star') { const j = sib.indexOf(el), full = sib.filter(x => data[x._key]).length;
+        sib.forEach((x, k) => { data[x._key] = (full === j + 1 ? 0 : k <= j) ? 1 : undefined; x._paint(); }); }
+      else { const n = mode.split('|').length; data[key] = ((data[key] || 0) + 1) % (n + 1) || undefined; paint(); }
+      save(); });
+    el._key = key;
+  });
+}
+
+function photos(pg, pid) {  // vision board: tap a frame to put a photo in it, × takes it out
+  pg.querySelectorAll('[data-photo]').forEach((el, i) => {
+    const key = `${pid}|photo${i}`;
+    const paint = () => { const v = data[key];
+      Object.assign(el.style, v ? {backgroundImage: `url(${v})`, backgroundSize: 'cover', backgroundPosition: 'center'} : {backgroundImage: ''});
+      el.querySelectorAll('.px').forEach(x => x.remove());
+      el.style.position = 'relative'; el.style.cursor = 'pointer';
+      if (el.clientWidth >= 80) el.insertAdjacentHTML('beforeend', v ? '<button class="px" aria-label="remove">×</button>' : '<span class="px plus">＋</span>'); };
+    paint();
+    el.addEventListener('click', e => { e.preventDefault();
+      if (e.target.classList.contains('px') && data[key]) { data[key] = undefined; save(); paint(); return; }
+      if (data[key] && el.clientWidth < 80 && confirm(T.unphoto)) { data[key] = undefined; save(); paint(); return; }  // book spines
+      const f = document.createElement('input'); f.type = 'file'; f.accept = 'image/*';
+      f.onchange = () => { const img = new Image(), url = URL.createObjectURL(f.files[0]);
+        img.onload = () => { const m = 900 / Math.max(img.width, img.height), c = document.createElement('canvas');
+          c.width = Math.round(img.width * Math.min(1, m)); c.height = Math.round(img.height * Math.min(1, m));
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+          data[key] = c.toDataURL('image/jpeg', .8); save(); paint(); };
+        img.src = url; };
+      f.click(); });
+  });
+}
+
+function fit() {
+  if (!meta) return; scale = Math.min(innerWidth / meta.W, innerHeight / meta.H);
+  stage.style.transform = `translate(${(innerWidth - meta.W * scale) / 2}px,${(innerHeight - meta.H * scale) / 2}px) scale(${scale})`;
+}
+
+const NOTES = APP.notes;  // note pages: the buyer adds as many sheets as needed (the PDF is duplicated in a note app)
+let sheet = 1;
+function noteBar(base) {
+  let bar = document.getElementById('nbar'); if (bar) bar.remove(); if (!NOTES.includes(base)) return;
+  const n = Math.max(data[`${base}~n`] || 1, sheet);
+  bar = document.createElement('div'); bar.id = 'nbar';
+  const name = k => data[`${base}~name${k}`] || '', esc = t => t.replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]);
+  const label = name(sheet) ? esc(name(sheet)) : `${sheet} / ${n}`;
+  bar.innerHTML = `<button data-k="${sheet - 1}" ${sheet > 1 ? '' : 'disabled'}>‹</button><span data-k="list">${label}</span>` +
+    `<button data-k="${sheet + 1}" ${sheet < n ? '' : 'disabled'}>›</button><button data-k="new">＋</button>`;
+  const open = k => go(k === 1 ? base : `${base}~${k}`), add = () => { data[`${base}~n`] = n + 1; save(); open(n + 1); };
+  bar.onclick = e => { const k = e.target.dataset && e.target.dataset.k; if (!k) return;
+    if (k === 'new') add(); else if (k === 'list') list(); else open(+k); };
+  const list = () => {  // every sheet of this note page, with a name the buyer can give it
+    const box = document.getElementById('nlist'), rows = [...Array(n).keys()].map(i => i + 1).map(k =>
+      `<div class="nr${k === sheet ? ' on' : ''}"><b>${k}</b><input data-k="${k}" value="${esc(name(k))}" placeholder="${T.page} ${k}">` +
+      `<button data-go="${k}">›</button></div>`).join('');
+    box.innerHTML = `<div><h3>📒 ${T.pages}</h3>${rows}<button data-new>＋ ${T.newpage}</button><button data-close>${T.close}</button></div>`;
+    box.style.display = 'flex';
+    box.oninput = e => { const k = e.target.dataset.k; if (k) { data[`${base}~name${k}`] = e.target.value.trim() || undefined; save(); } };
+    box.onclick = e => { const t = e.target;
+      if (t.dataset.go) { box.style.display = 'none'; open(+t.dataset.go); }
+      else if ('new' in t.dataset) { box.style.display = 'none'; add(); }
+      else if ('close' in t.dataset || t === box) { box.style.display = 'none'; noteBar(base); } };
+  };
+  document.body.appendChild(bar);
+}
+const go = id => { history.pushState(null, '', '#' + id); show(id); };
+
+async function show(pid) {
+  const [base, k] = (pid || '').split('~'); sheet = +(k || 1); pid = base;
+  const want = pick();
+  if (want !== layout) { layout = want; meta = await get(`${layout}/meta.json`, 'json');
+    document.getElementById('lcss').textContent = meta.css; }
+  let i = meta.ids.indexOf(pid); if (i < 0) { pid = meta.ids[0]; i = 0; }
+  const [chunk, ...arts] = await Promise.all([get(`${layout}/c${Math.floor(i / APP.chunk)}.json.gz`, 'json'),
+    ...meta.art[i].map(a => get(`${layout}/a${a}.svg.gz`))]);
+  cur = pid; fit();
+  stage.style.width = meta.W + 'px'; stage.style.height = meta.H + 'px';
+  stage.innerHTML = arts.map(s => `<div class="art">${s}</div>`).join('') + chunk[pid];
+  const sid = sheet > 1 ? `${pid}~${sheet}` : pid;  // later note sheets keep their own text
+  const pg = stage.querySelector('.page'); if (meta.prep) new Function('root', meta.prep)(pg); fill(pg); fields(pg, sid); taps(pg, sid); photos(pg, sid); noteBar(pid);
+  if (/^index/.test(pid)) {  // the app menu (backup, help) lives on the index pages, next to the title
+    const h = pg.querySelector('.hdr'), b = document.createElement('button'); b.className = 'btn appmenu'; b.textContent = '⚙ ' + T.menu;
+    b.onclick = e => { e.stopPropagation(); openMenu(); }; if (h) h.appendChild(b); }
+  document.getElementById('wait').style.display = 'none';
+  if (location.hash.slice(1) !== sid) history.replaceState(null, '', '#' + sid);
+  scrollTo(0, 0);
+}
+
+function dialog(o) {  // the app writes the calendar file itself, so the event carries the buyer's own name and time
+  const box = document.getElementById('nlist'), freqs = ['', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'];
+  const f0 = ((o.rule || '').match(/FREQ=(\w+)/) || [])[1] || '';
+  box.innerHTML = `<div><h3>${o.head}</h3><label>${T.bname}<input id="bn" autocomplete="off"></label>` +
+    `<label>${T.bdate}<input id="bd" type="${o.allday ? 'date' : 'datetime-local'}"></label>` +
+    `<label>${T.brep}<select id="br">${freqs.map((f, i) => `<option value="${f}"${f === f0 ? ' selected' : ''}>${T.freq[i]}</option>`).join('')}</select></label>` +
+    `<p>${T.bnote}</p><button data-apple>${T.badd}</button><button data-google>${T.bgoogle}</button><button data-close>${T.close}</button></div>`;
+  document.getElementById('bn').value = o.name || ''; document.getElementById('bd').value = o.when;
+  box.style.display = 'flex'; box.oninput = null;
+  box.onclick = e => { const t = e.target;
+    if ('close' in t.dataset || t === box) { box.style.display = 'none'; return; }
+    if (!('apple' in t.dataset) && !('google' in t.dataset)) return;
+    const v = document.getElementById('bd').value, m = v.match(/^(\d{4})-(\d\d)-(\d\d)(?:T(\d\d):(\d\d))?/); if (!m) return;
+    const f = document.getElementById('br').value, rule = !f ? '' : f === f0 ? o.rule : `FREQ=${f}`;
+    const title = (document.getElementById('bn').value || '').trim() || o.head, clean = title.replace(/[,;\\]/g, ' ');
+    const pad = n => String(n).padStart(2, '0'), ymd = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
+    let start, end;
+    if (o.allday) { const d = new Date(+m[1], +m[2] - 1, +m[3]); start = ymd(d); d.setDate(d.getDate() + 1); end = ymd(d); }
+    else { const d = new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]); start = `${ymd(d)}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+      d.setHours(d.getHours() + 1); end = `${ymd(d)}T${pad(d.getHours())}${pad(d.getMinutes())}00`; }
+    if ('apple' in t.dataset) {
+      const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//SpecialNStudio//Planner//EN', 'BEGIN:VEVENT',
+        `UID:${Date.now()}-${Math.random().toString(36).slice(2)}@planner`, 'DTSTAMP:20260101T000000Z',
+        o.allday ? `DTSTART;VALUE=DATE:${start}` : `DTSTART:${start}`, o.allday ? `DTEND;VALUE=DATE:${end}` : `DTEND:${end}`,
+        ...(rule ? [`RRULE:${rule}`] : []), `SUMMARY:${clean}`,
+        'BEGIN:VALARM', o.allday ? 'TRIGGER:PT9H' : 'TRIGGER:-PT0M', 'ACTION:DISPLAY', `DESCRIPTION:${clean}`, 'END:VALARM',
+        'END:VEVENT', 'END:VCALENDAR', ''].join('\r\n');
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([ics], {type: 'text/calendar'}));
+      a.download = 'event.ics'; document.body.appendChild(a); a.click(); a.remove();
+    } else open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}` +
+        (rule ? `&recur=${encodeURIComponent('RRULE:' + rule)}` : ''), '_blank');
+  };
+  setTimeout(() => document.getElementById('bn').focus(), 50);
+}
+function popMenu(p) {  // "What would you like to do?" from the icon row of a page
+  if (!p) return; const box = document.getElementById('nlist');
+  box.innerHTML = `<div><h3>${T.what}</h3>${p.ctx ? `<p>${p.ctx}</p>` : ''}` +
+    p.rows.map((r, i) => `<button data-row="${i}">${r[1]}</button>`).join('') + `<button data-close>${T.close}</button></div>`;
+  box.style.display = 'flex'; box.oninput = null;
+  box.onclick = e => { const t = e.target;
+    if ('close' in t.dataset || t === box) { box.style.display = 'none'; return; }
+    if (t.dataset.row === undefined) return; const u = p.rows[+t.dataset.row][2]; box.style.display = 'none';
+    if (/\/cal\/[^/]+\.ics$/.test(u)) repeat(u, T.rem); else if (u.includes('/bday/')) birthday();
+    else if (u.startsWith('http')) open(u, '_blank'); else location.href = u; };
+}
+const birthday = () => dialog({head: '🎂 ' + T.bday, name: '', allday: true, when: `${APP.year}-01-01`, rule: 'FREQ=YEARLY'});
+async function repeat(href, label) {  // "+ Apple repeat": the reminder's calendar file gives the defaults
+  let txt = '';
+  try { const r = await fetch(href); if (r.ok) txt = await r.text(); } catch (e) {}
+  const get = k => ((txt.match(new RegExp(`^${k}[:;][^\r\n]*`, 'm')) || [''])[0].split(':').slice(1).join(':'));
+  let name = get('SUMMARY'), st = get('DTSTART'), rule = get('RRULE');
+  if (!st) {  // offline: read it from the file name, e.g. en-budget-check-freq-monthly-0101-1900.ics
+    const parts = decodeURIComponent(href.split('/').pop().replace('.ics', '')).split('-'), hm = parts.pop(), md = parts.pop();
+    const fi = parts.indexOf('freq'); st = `${APP.year}${md}T${hm}00`;
+    rule = fi < 0 ? '' : parts.slice(fi).join(' ').toUpperCase().replace(/(\w+) (\w+)/g, '$1=$2;').replace(/;$/, '').replace(/ /g, '');
+    name = parts.slice(1, fi < 0 ? undefined : fi).join(' '); name = name.charAt(0).toUpperCase() + name.slice(1);
+  }
+  const when = `${st.slice(0, 4)}-${st.slice(4, 6)}-${st.slice(6, 8)}T${st.slice(9, 11) || '09'}:${st.slice(11, 13) || '00'}`;
+  dialog({head: label, name: name.trim(), allday: false, when, rule});
+}
+
+stage.addEventListener('click', e => {
+  const a = e.target.closest('a'); if (!a) return; const h = a.getAttribute('href') || '';
+  if (h.startsWith('https://pn.pop/')) { e.preventDefault(); popMenu(meta.pop[h.split('/').pop()]); return; }
+  if (h.includes('/bday/')) { e.preventDefault(); birthday(); return; }
+  if (/\/cal\/[^/]+\.ics$/.test(h)) { e.preventDefault(); repeat(h, '⏰ ' + T.rem); return; }
+  if (h.startsWith('#')) { e.preventDefault(); if (h.length > 1) { history.pushState(null, '', h); show(h.slice(1)); } }
+  else if (h.startsWith('http')) { e.preventDefault(); open(h, '_blank'); }
+});
+addEventListener('popstate', () => show(location.hash.slice(1) || APP.home));
+const turn = d => { if (!meta) return; const i = meta.ids.indexOf(cur) + d;  // page turning, like scrolling the PDF
+  if (i >= 0 && i < meta.ids.length) { history.pushState(null, '', '#' + meta.ids[i]); show(meta.ids[i]); } };
+let tx = null, ty = 0;
+addEventListener('touchstart', e => { if (e.touches.length === 1 && menu.style.display !== 'flex') { tx = e.touches[0].clientX; ty = e.touches[0].clientY; } else tx = null; }, {passive: true});
+addEventListener('touchend', e => { if (tx === null) return; const t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty; tx = null;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > 1.5 * Math.abs(dy)) turn(dx < 0 ? 1 : -1); }, {passive: true});
+addEventListener('keydown', e => { if (/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (['ArrowRight', 'ArrowDown', 'PageDown'].includes(e.key)) turn(1);
+  if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) turn(-1); });
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => pick() !== layout ? show(location.hash.slice(1) || cur) : fit(), 150); });
+
+const menu = document.getElementById('menu');
+const openMenu = () => menu.style.display = 'flex';
+document.getElementById('bclose').onclick = () => menu.style.display = 'none';
+document.getElementById('bsave').onclick = () => {
+  const blob = new Blob([JSON.stringify({planner: KEY, data})], {type: 'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `${APP.file}-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(a); a.click(); a.remove();
+  alert(T.saved);
+};
+const file = document.getElementById('file');
+document.getElementById('bload').onclick = () => file.click();
+file.onchange = async () => {
+  try { const j = JSON.parse(await file.files[0].text()); if (!j || typeof j.data !== 'object') throw 0;
+    data = j.data; save(); alert(T.loaded); menu.style.display = 'none'; show(location.hash.slice(1) || cur); } catch (e) { alert(T.bad); }
+  file.value = '';
+};
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+try { if (!localStorage.getItem(KEY + '-hint')) { const h = document.createElement('div'); h.id = 'hint'; h.textContent = T.hint;
+  document.body.appendChild(h); setTimeout(() => h.style.opacity = 0, 4000); localStorage.setItem(KEY + '-hint', '1'); } } catch (e) {}
+show(location.hash.slice(1) || APP.home).then(() => setTimeout(async () => {  // keep this layout offline: fetch it once, quietly
+  const l = layout, n = Math.ceil(meta.ids.length / APP.chunk), na = meta.art.flat().length ? Math.max(...meta.art.flat()) + 1 : 0;
+  for (const u of [...Array(n).keys()].map(i => `${l}/c${i}.json.gz`).concat([...Array(na).keys()].map(i => `${l}/a${i}.svg.gz`)))
+    try { await fetch(u); } catch (e) { return; }
+}, 3000));
+</script></body></html>
