@@ -1,5 +1,15 @@
 {
   "name": "specialnstudio-planner",
+  "main": "src/worker.js",
   "compatibility_date": "2025-09-01",
-  "assets": { "directory": "./", "not_found_handling": "404-page" }
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/p/*", "/__admin/*"]
+  },
+  "durable_objects": { "bindings": [{ "name": "GATE", "class_name": "Gate" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Gate"] }],
+  "triggers": { "crons": ["17 4 * * *"] },
+  "observability": { "enabled": true }
 }

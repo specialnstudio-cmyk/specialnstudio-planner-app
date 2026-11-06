@@ -1,4 +1,12 @@
 .git
 .git/**
+src
+src/**
 wrangler.jsonc
 .assetsignore
+node_modules
+node_modules/**
+.dev.vars
+.wrangler
+.wrangler/**
+.gitignore
