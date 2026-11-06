@@ -82,7 +82,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#2A1630;-webkit-text-s
 <div id="menu"><div><h3>Yedek & Yardım</h3><p>Sayfa çevirmek için sola ya da sağa kaydır (bilgisayarda ok tuşları). Boyamak için kareye, daireye ya da damlaya dokun. Not sayfalarında + yeni sayfa ekler; sayfalarına isim vermek ve birine gitmek için sayfa numarasına dokun. Vision board'da ve kitaplıkta fotoğraf eklemek için bir çerçeveye ya da kitaba dokun. Planlayıcın sadece bu cihazda kayıtlı. Başka bir telefona, tablete ya da bilgisayara taşımak için burada yedeği kaydet, orada geri yükle.</p><button id="bsave">Yedeği kaydet</button><button id="bload">Yedeği geri yükle</button>
 <button id="bclose">Kapat</button><input id="file" type="file" accept=".json,application/json" hidden></div></div>
 <script>
-const APP = {"key": "cye-2027-zebra-tr-mon", "chunk": 24, "home": "home", "file": "planner-backup-zebra-tr", "year": 2027, "notes": ["t-dot", "t-lined", "t-grid", "t-blank", "t-cornell", "t-brain"]}, T = {"menu": "Yedek & Yardım", "bday": "Doğum günü ekle", "bname": "İsim", "bdate": "Tarih", "badd": "Apple Takvim'e ekle", "bgoogle": "Google Takvim'e ekle", "bnote": "Başladığında hatırlatma gelir.", "rem": "Hatırlatma ekle", "brep": "Tekrar", "freq": ["Hiç", "Her gün", "Her hafta", "Her ay", "Her yıl"], "btitle": "🎂 ", "unphoto": "Bu fotoğraf kaldırılsın mı? (Vazgeç yeni bir fotoğraf seçer.)", "full": "Bu cihazdaki planlayıcı alanı doldu. Birkaç fotoğrafı çıkar, sonra bir yedek kaydet.", "page": "Sayfa", "pages": "Sayfalar", "newpage": "Yeni sayfa", "save": "Yedeği kaydet", "load": "Yedeği geri yükle", "close": "Kapat", "saved": "Yedek kaydedildi. Dosyayı güvenli bir yerde sakla (Dosyalar, iCloud Drive, Google Drive).", "loaded": "Yedek geri yüklendi.", "bad": "Bu dosya bir planlayıcı yedeği değil.", "hint": "Sayfa çevirmek için sola ya da sağa kaydır", "note": "Sayfa çevirmek için sola ya da sağa kaydır (bilgisayarda ok tuşları). Boyamak için kareye, daireye ya da damlaya dokun. Not sayfalarında + yeni sayfa ekler; sayfalarına isim vermek ve birine gitmek için sayfa numarasına dokun. Vision board'da ve kitaplıkta fotoğraf eklemek için bir çerçeveye ya da kitaba dokun. Planlayıcın sadece bu cihazda kayıtlı. Başka bir telefona, tablete ya da bilgisayara taşımak için burada yedeği kaydet, orada geri yükle.", "loading": "Yükleniyor…"}, KEY = APP.key, stage = document.getElementById('stage');
+const APP = {"key": "cye-2027-zebra-tr-mon", "chunk": 24, "home": "home", "file": "planner-backup-zebra-tr", "year": 2027, "layouts": ["phone", "portrait", "landscape"], "notes": ["t-dot", "t-lined", "t-grid", "t-blank", "t-cornell", "t-brain"]}, T = {"menu": "Yedek & Yardım", "what": "Ne yapmak istersin?", "bday": "Doğum günü ekle", "bname": "İsim", "bdate": "Tarih", "badd": "Apple Takvim'e ekle", "bgoogle": "Google Takvim'e ekle", "bnote": "Başladığında hatırlatma gelir.", "rem": "Hatırlatma ekle", "brep": "Tekrar", "freq": ["Hiç", "Her gün", "Her hafta", "Her ay", "Her yıl"], "btitle": "🎂 ", "unphoto": "Bu fotoğraf kaldırılsın mı? (Vazgeç yeni bir fotoğraf seçer.)", "full": "Bu cihazdaki planlayıcı alanı doldu. Birkaç fotoğrafı çıkar, sonra bir yedek kaydet.", "page": "Sayfa", "pages": "Sayfalar", "newpage": "Yeni sayfa", "save": "Yedeği kaydet", "load": "Yedeği geri yükle", "close": "Kapat", "saved": "Yedek kaydedildi. Dosyayı güvenli bir yerde sakla (Dosyalar, iCloud Drive, Google Drive).", "loaded": "Yedek geri yüklendi.", "bad": "Bu dosya bir planlayıcı yedeği değil.", "hint": "Sayfa çevirmek için sola ya da sağa kaydır", "note": "Sayfa çevirmek için sola ya da sağa kaydır (bilgisayarda ok tuşları). Boyamak için kareye, daireye ya da damlaya dokun. Not sayfalarında + yeni sayfa ekler; sayfalarına isim vermek ve birine gitmek için sayfa numarasına dokun. Vision board'da ve kitaplıkta fotoğraf eklemek için bir çerçeveye ya da kitaba dokun. Planlayıcın sadece bu cihazda kayıtlı. Başka bir telefona, tablete ya da bilgisayara taşımak için burada yedeği kaydet, orada geri yükle.", "loading": "Yükleniyor…"}, KEY = APP.key, stage = document.getElementById('stage');
 let data = {}; try { data = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
 let layout = null, meta = null, cur = null, scale = 1;
 const files = {};
@@ -94,7 +94,8 @@ const gunzip = async buf => {
 };
 const get = (u, kind) => files[u] || (files[u] = fetch(u).then(async r => { if (!r.ok) throw u;
   const t = u.endsWith('.gz') ? await gunzip(await r.arrayBuffer()) : await r.text(); return kind === 'json' ? JSON.parse(t) : t; }));
-const pick = () => { const r = innerWidth / innerHeight; return r < .62 ? 'phone' : r < 1.08 ? 'portrait' : 'landscape'; };
+const pick = () => { const r = innerWidth / innerHeight, l = r < .62 ? 'phone' : r < 1.08 ? 'portrait' : 'landscape';
+  return APP.layouts.includes(l) ? l : 'portrait'; };
 let warned = false;
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { if (!warned) { warned = true; alert(T.full); } } };
 
@@ -115,22 +116,24 @@ function fill(root) {  // the writing lines, dots and grids (same drawing as the
 
 function fields(pg, pid) {  // text boxes and check boxes over every writing line, keyed by box label so layouts share them
   const P = pg.getBoundingClientRect(), out = [], count = {}, boxes = new Map();
-  const box = el => { const b = el.closest('.bx,.tbl,.field,.area,.row,.col') || pg;
-    if (!boxes.has(b)) { const c = b.querySelector('.chip,.label,b,a'); boxes.set(b, ((c && c.textContent) || 'x' + boxes.size).trim().slice(0, 24)); }
+  const box = el => { const b = el.closest(APP.box || '.bx,.tbl,.field,.area,.row,.col') || pg;
+    if (!boxes.has(b)) { const c = b.querySelector(APP.label || '.chip,.label,b,a'); boxes.set(b, ((c && c.textContent) || 'x' + boxes.size).trim().slice(0, 24)); }
     return boxes.get(b); };
-  const add = (el, t, x, y, w, h) => { if (w / scale < 18 || h / scale < 10) return; const b = box(el), k = `${b}|${t}`;
+  const add = (el, t, x, y, w, h) => { if (w / scale < 18 || h / scale < 10) return;  /* too small to tap */ const b = box(el), k = `${b}|${t}`;
     count[k] = (count[k] || 0) + 1; out.push({t, x: (x - P.left) / scale, y: (y - P.top) / scale, w: w / scale, h: h / scale,
       key: `${pid}|${k}${count[k]}`}); };
   const after = (el, r) => { let x = r.left + 6 * scale;
     el.querySelectorAll('b,span,.box,svg').forEach(c => { const q = c.getBoundingClientRect();
       if (q.width && q.left < r.left + r.width * .5) x = Math.max(x, q.right + 8 * scale); }); return x; };
   pg.querySelectorAll('.box').forEach(b => { const r = b.getBoundingClientRect(); add(b, 'c', r.left, r.top, r.width, r.height); });
-  pg.querySelectorAll('.ln,.field').forEach(el => { const r = el.getBoundingClientRect(), x = after(el, r);
+  pg.querySelectorAll('.ln,.field,[data-ln]').forEach(el => { const r = el.getBoundingClientRect(), x = after(el, r);
     let right = r.right - 4 * scale; el.querySelectorAll('.plus').forEach(c => right = Math.min(right, c.getBoundingClientRect().left - 6 * scale));
     add(el, 't', x, r.top + 2 * scale, right - x, r.height - 4 * scale); });
-  pg.querySelectorAll('.tbl .tr > div').forEach(el => { if (el.querySelector('b')) return; const r = el.getBoundingClientRect();
+  pg.querySelectorAll(APP.cells || '.tbl .tr > div').forEach(el => { if (el.querySelector('b') || el.textContent.trim()) return; const r = el.getBoundingClientRect();
     add(el, 't', r.left + 4 * scale, r.top + scale, r.width - 8 * scale, r.height - 2 * scale); });
-  pg.querySelectorAll('.area').forEach(el => { if (el.children.length || el.textContent.trim()) return;  // an empty page area
+  pg.querySelectorAll('[data-blank]').forEach(el => { const r = el.getBoundingClientRect();  // a whole note page
+    add(el, 'm', r.left + 8 * scale, r.top + 8 * scale, r.width - 16 * scale, r.height - 16 * scale); });
+  pg.querySelectorAll(APP.areas || '.area').forEach(el => { if (el.children.length || el.textContent.trim()) return;  // an empty page area
     const r = el.getBoundingClientRect(); add(el, 'm', r.left + 8 * scale, r.top + 8 * scale, r.width - 16 * scale, r.height - 16 * scale); });
   pg.querySelectorAll('[data-fill]').forEach(el => { const r = el.getBoundingClientRect(); if (!r.width) return;
     if (el.dataset.fill === 'lines') { const g = +(el.dataset.gap || 32) * scale;
@@ -138,7 +141,7 @@ function fields(pg, pid) {  // text boxes and check boxes over every writing lin
     } else add(el, 'm', r.left + 8 * scale, r.top + 8 * scale, r.width - 16 * scale, r.height - 16 * scale); });
   for (const f of out) {
     const el = document.createElement(f.t === 'm' ? 'textarea' : 'input');
-    el.type = f.t === 'c' ? 'checkbox' : 'text';
+    el.type = f.t === 'c' ? 'checkbox' : 'text'; el.dataset.k = f.key;
     Object.assign(el.style, {left: f.x + 'px', top: f.y + 'px', width: f.w + 'px', height: f.h + 'px',
       fontSize: (f.t === 'm' ? 17 : Math.max(13, Math.min(18, f.h * .62))) + 'px'});
     if (f.t === 'c') { el.checked = !!data[f.key]; el.onchange = () => { data[f.key] = el.checked || undefined; save(); }; }
@@ -149,11 +152,13 @@ function fields(pg, pid) {  // text boxes and check boxes over every writing lin
 
 function taps(pg, pid) {  // colouring pages: a tap gives a cell the next colour; mood picks one; stars rate
   pg.querySelectorAll('[data-tap]').forEach((el, i) => {
-    const key = `${pid}|tap${i}`, mode = el.dataset.tap, svg = el.tagName.toLowerCase() === 'svg' ? el.querySelector('path') : null;
+    const key = `${pid}|tap${i}`, mode = el.dataset.tap, one = el.children.length === 1 ? el.firstElementChild : null;
+    const svg = el.tagName.toLowerCase() === 'svg' ? el.querySelector('path,circle') :
+      one && one.tagName.toLowerCase() === 'svg' && mode !== 'star' ? one.querySelector('path,circle') : null;
     const orig = svg ? svg.getAttribute('fill') : el.style.background, origColor = el.style.color;
     const paint = () => { const v = data[key] || 0;
       if (mode === 'one') { el.style.boxShadow = v ? '0 0 0 3px #fff, 0 0 0 6px #2A1630' : ''; el.style.transform = v ? 'scale(1.12)' : ''; }
-      else if (mode === 'star') el.style.color = v ? origColor : '#fff';
+      else if (mode === 'star') { if (el.textContent.trim()) el.style.color = v ? origColor : '#fff'; else el.style.opacity = v ? 1 : .3; }
       else { const c = v ? mode.split('|')[v - 1] : orig; if (svg) svg.setAttribute('fill', c); else el.style.background = c; } };
     el._paint = paint; el.style.cursor = 'pointer'; paint();
     el.addEventListener('click', e => { e.preventDefault(); e.stopPropagation();
@@ -236,7 +241,7 @@ async function show(pid) {
   stage.style.width = meta.W + 'px'; stage.style.height = meta.H + 'px';
   stage.innerHTML = arts.map(s => `<div class="art">${s}</div>`).join('') + chunk[pid];
   const sid = sheet > 1 ? `${pid}~${sheet}` : pid;  // later note sheets keep their own text
-  const pg = stage.querySelector('.page'); fill(pg); fields(pg, sid); taps(pg, sid); photos(pg, sid); noteBar(pid);
+  const pg = stage.querySelector('.page'); if (meta.prep) new Function('root', meta.prep)(pg); fill(pg); fields(pg, sid); taps(pg, sid); photos(pg, sid); noteBar(pid);
   if (/^index/.test(pid)) {  // the app menu (backup, help) lives on the index pages, next to the title
     const h = pg.querySelector('.hdr'), b = document.createElement('button'); b.className = 'btn appmenu'; b.textContent = '⚙ ' + T.menu;
     b.onclick = e => { e.stopPropagation(); openMenu(); }; if (h) h.appendChild(b); }
@@ -279,6 +284,17 @@ function dialog(o) {  // the app writes the calendar file itself, so the event c
   };
   setTimeout(() => document.getElementById('bn').focus(), 50);
 }
+function popMenu(p) {  // "What would you like to do?" from the icon row of a page
+  if (!p) return; const box = document.getElementById('nlist');
+  box.innerHTML = `<div><h3>${T.what}</h3>${p.ctx ? `<p>${p.ctx}</p>` : ''}` +
+    p.rows.map((r, i) => `<button data-row="${i}">${r[1]}</button>`).join('') + `<button data-close>${T.close}</button></div>`;
+  box.style.display = 'flex'; box.oninput = null;
+  box.onclick = e => { const t = e.target;
+    if ('close' in t.dataset || t === box) { box.style.display = 'none'; return; }
+    if (t.dataset.row === undefined) return; const u = p.rows[+t.dataset.row][2]; box.style.display = 'none';
+    if (/\/cal\/[^/]+\.ics$/.test(u)) repeat(u, T.rem); else if (u.includes('/bday/')) birthday();
+    else if (u.startsWith('http')) open(u, '_blank'); else location.href = u; };
+}
 const birthday = () => dialog({head: '🎂 ' + T.bday, name: '', allday: true, when: `${APP.year}-01-01`, rule: 'FREQ=YEARLY'});
 async function repeat(href, label) {  // "+ Apple repeat": the reminder's calendar file gives the defaults
   let txt = '';
@@ -297,6 +313,7 @@ async function repeat(href, label) {  // "+ Apple repeat": the reminder's calend
 
 stage.addEventListener('click', e => {
   const a = e.target.closest('a'); if (!a) return; const h = a.getAttribute('href') || '';
+  if (h.startsWith('https://pn.pop/')) { e.preventDefault(); popMenu(meta.pop[h.split('/').pop()]); return; }
   if (h.includes('/bday/')) { e.preventDefault(); birthday(); return; }
   if (/\/cal\/[^/]+\.ics$/.test(h)) { e.preventDefault(); repeat(h, '⏰ ' + T.rem); return; }
   if (h.startsWith('#')) { e.preventDefault(); if (h.length > 1) { history.pushState(null, '', h); show(h.slice(1)); } }
@@ -334,7 +351,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 try { if (!localStorage.getItem(KEY + '-hint')) { const h = document.createElement('div'); h.id = 'hint'; h.textContent = T.hint;
   document.body.appendChild(h); setTimeout(() => h.style.opacity = 0, 4000); localStorage.setItem(KEY + '-hint', '1'); } } catch (e) {}
 show(location.hash.slice(1) || APP.home).then(() => setTimeout(async () => {  // keep this layout offline: fetch it once, quietly
-  const l = layout, n = Math.ceil(meta.ids.length / APP.chunk), na = Math.max(...meta.art.flat()) + 1;
+  const l = layout, n = Math.ceil(meta.ids.length / APP.chunk), na = meta.art.flat().length ? Math.max(...meta.art.flat()) + 1 : 0;
   for (const u of [...Array(n).keys()].map(i => `${l}/c${i}.json.gz`).concat([...Array(na).keys()].map(i => `${l}/a${i}.svg.gz`)))
     try { await fetch(u); } catch (e) { return; }
 }, 3000));
