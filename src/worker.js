@@ -17,6 +17,13 @@ const PRODUCTS = {  // app folder → Etsy listing ids that unlock it
   "plum-en-mon": ["4611085973"],
   "plum-en-sun": ["4611085973"],
   "plum-tr-mon": ["4611105908"],
+  "energy-en-mon": ["4611256878"], "energy-en-sun": ["4611256878"],
+  "energy-tr-mon": ["4611219123"], "energy-tr-sun": ["4611219123"],
+  "leopard-en-mon": ["4611242342"], "leopard-en-sun": ["4611242342"],
+  "leopard-tr-mon": ["4611226131"], "leopard-tr-sun": ["4611226131"],
+  "poppy-en-mon": ["4611247886"], "poppy-en-sun": ["4611247886"],
+  "zebra-en-mon": ["4611250640"], "zebra-en-sun": ["4611250640"],
+  "zebra-tr-mon": ["4611253704"], "zebra-tr-sun": ["4611253704"],
 };
 const OPEN_FILES = /\/(manifest\.webmanifest|icon-512\.png|sw\.js|fonts\/[^/]+\.ttf)$/;  // fetched without cookies, or by the activation page
 const MAX_DEVICES = 5;
