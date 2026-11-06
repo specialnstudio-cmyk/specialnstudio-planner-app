@@ -295,6 +295,12 @@ function popMenu(p) {  // "What would you like to do?" from the icon row of a pa
     if (/\/cal\/[^/]+\.ics$/.test(u)) repeat(u, T.rem); else if (u.includes('/bday/')) birthday();
     else if (u.startsWith('http')) open(u, '_blank'); else location.href = u; };
 }
+function shortcut(h) {  // the PDF's Apple Shortcut links: in the app the dialog writes the calendar file itself, no shortcut needed
+  const q = new URLSearchParams(h.split('?')[1] || ''), txt = q.get('text') || '', rem = /remind/i.test(q.get('name') || '');
+  const m = txt.match(/(\d{4}-\d\d-\d\d)(?:[ T](\d\d:\d\d))?/);
+  const day = m ? m[1] : `${APP.year}-01-01`, time = m && m[2] ? m[2] : '09:00';
+  dialog({head: rem ? '⏰ ' + T.rem : '📅 ' + T.badd, name: '', allday: false, when: `${day}T${time}`, rule: ''});
+}
 const birthday = () => dialog({head: '🎂 ' + T.bday, name: '', allday: true, when: `${APP.year}-01-01`, rule: 'FREQ=YEARLY'});
 async function repeat(href, label) {  // "+ Apple repeat": the reminder's calendar file gives the defaults
   let txt = '';
@@ -316,6 +322,7 @@ stage.addEventListener('click', e => {
   if (h.startsWith('https://pn.pop/')) { e.preventDefault(); popMenu(meta.pop[h.split('/').pop()]); return; }
   if (h.includes('/bday/')) { e.preventDefault(); birthday(); return; }
   if (/\/cal\/[^/]+\.ics$/.test(h)) { e.preventDefault(); repeat(h, '⏰ ' + T.rem); return; }
+  if (h.startsWith('shortcuts://')) { e.preventDefault(); shortcut(h); return; }
   if (h.startsWith('#')) { e.preventDefault(); if (h.length > 1) { history.pushState(null, '', h); show(h.slice(1)); } }
   else if (h.startsWith('http')) { e.preventDefault(); open(h, '_blank'); }
 });
