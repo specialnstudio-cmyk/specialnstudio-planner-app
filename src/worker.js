@@ -23,7 +23,8 @@ const PRODUCTS = {  // app folder → Etsy listing ids that unlock it
   "leopard-tr-mon": ["4611226131"], "leopard-tr-sun": ["4611226131"],
   "poppy-en-mon": ["4611247886"], "poppy-en-sun": ["4611247886"],
   "zebra-en-mon": ["4611250640"], "zebra-en-sun": ["4611250640"],
-  "zebra-tr-mon": ["4611253704"], "zebra-tr-sun": ["4611253704"],
+  // the Zebra TR PDF planner (4602313474) also unlocks the app, as its bonus
+  "zebra-tr-mon": ["4611253704", "4602313474"], "zebra-tr-sun": ["4611253704", "4602313474"],
 };
 const OPEN_FILES = /\/(manifest\.webmanifest|icon-512\.png|sw\.js|fonts\/[^/]+\.ttf)$/;  // fetched without cookies, or by the activation page
 const MAX_DEVICES = 5;
