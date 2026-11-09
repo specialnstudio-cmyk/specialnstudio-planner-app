@@ -241,7 +241,11 @@ async function show(pid) {
   stage.style.width = meta.W + 'px'; stage.style.height = meta.H + 'px';
   stage.innerHTML = arts.map(s => `<div class="art">${s}</div>`).join('') + chunk[pid];
   const sid = sheet > 1 ? `${pid}~${sheet}` : pid;  // later note sheets keep their own text
-  const pg = stage.querySelector('.page'); if (meta.prep) new Function('root', meta.prep)(pg); fill(pg); fields(pg, sid); taps(pg, sid); photos(pg, sid); noteBar(pid);
+  const pg = stage.querySelector('.page'); if (meta.prep) new Function('root', meta.prep)(pg);
+  fill(pg);
+  pg.querySelectorAll('.hdr .t').forEach(t => {  /* long titles shrink until they fit the narrow phone page */
+    let f = parseFloat(getComputedStyle(t).fontSize); while (t.scrollWidth > t.clientWidth + 1 && f > 18) { f -= 2; t.style.setProperty('font-size', f + 'px', 'important'); } });
+ fields(pg, sid); taps(pg, sid); photos(pg, sid); noteBar(pid);
   if (/^index/.test(pid)) {  // the app menu (backup, help) lives on the index pages, next to the title
     const h = pg.querySelector('.hdr'), b = document.createElement('button'); b.className = 'btn appmenu'; b.textContent = '⚙ ' + T.menu;
     b.onclick = e => { e.stopPropagation(); openMenu(); }; if (h) h.appendChild(b); }
