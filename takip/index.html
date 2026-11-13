@@ -503,13 +503,14 @@ function goalSheet(hb, n, unit) {
     <div class="qs">${quick.map(([qn, qu, l]) => `<button data-a="q" data-n="${qn}" data-u="${qu}" class="${qn === n && qu === unit ? 'on' : ''}">${l}</button>`).join('')}</div>
     <div class="gin"><input type="number" id="gn" min="1" max="999" inputmode="numeric" value="${n}" aria-label="Sayı">
       <button data-a="u" data-u="h" class="${unit === 'h' ? 'on' : ''}">saat</button><button data-a="u" data-u="d" class="${unit === 'd' ? 'on' : ''}">gün</button></div>
-    <button class="btn yes" data-a="start">${g ? 'Yeni hedefi başlat' : 'Hedefi başlat'} 🎯</button>
+    ${g ? '<button class="btn yes" data-a="gedit">Süreyi güncelle (sayaç kalsın)</button><button class="btn" data-a="start">Baştan başlat 🎯</button>' : '<button class="btn yes" data-a="start">Hedefi başlat 🎯</button>'}
     ${g ? '<button class="btn" data-a="grep">Bu hedefin raporu 📄</button><button class="btn flat" data-a="gdel">Hedefi kaldır</button>' : '<button class="btn flat" data-a="x">Vazgeç</button>'}</div>`, (a, b) => {
     const v = Math.min(Math.max(parseInt(document.getElementById('gn').value) || 1, 1), 999);
     if (a === 'x') return closeSheet();
     if (a === 'q') return goalSheet(hb, +b.dataset.n, b.dataset.u);
     if (a === 'u') return goalSheet(hb, v, b.dataset.u);
     if (a === 'grep') return report({ dates: goalDates(hb), habits: [hb], title: 'HEDEF RAPORU', goal: hb });
+    if (a === 'gedit') { hb.goal.n = v; hb.goal.unit = unit; delete hb.goal.doneAt; save(); checkGoals(); render(); closeSheet(); return toast(`🎯 Hedef ${v} ${unit === 'h' ? 'saat' : 'gün'} olarak güncellendi`); }
     if (a === 'gdel') { delete hb.goal; save(); render(); closeSheet(); return toast('Hedef kaldırıldı'); }
     hb.goal = { n: v, unit, start: Date.now() }; save(); render(); closeSheet(); toast(`🎯 ${v} ${unit === 'h' ? 'saatlik' : 'günlük'} hedef başladı!`);
   });
@@ -559,7 +560,8 @@ function settings() {
       <input type="text" value="${esc(hb.name)}" data-f="name" data-i="${i}" aria-label="Konu adı" maxlength="40"></div>
       ${hb.steps.map((st, j) => `<div class="stp"><input value="${esc(st.label)}" data-f="label" data-i="${i}" data-j="${j}" aria-label="Adım adı" maxlength="24">
         <input type="time" value="${st.time}" data-f="time" data-i="${i}" data-j="${j}" aria-label="Saat"><button data-a="del" data-i="${i}" data-j="${j}" aria-label="Adımı sil">✕</button></div>`).join('')}
-      <button class="add" data-a="add" data-i="${i}">+ Adım ekle</button></div>`;
+      <button class="add" data-a="add" data-i="${i}">+ Adım ekle</button>
+      <button class="kind" style="margin:10px 0 0;background:var(--yellow)" data-a="goal" data-i="${i}">🎯 ${hb.goal ? `Hedef: ${goalInfo(hb).label} (${goalInfo(hb).done ? 'tutturuldu' : goalInfo(hb).txt}) · düzenle` : 'Hedef koy (saat ya da gün)'}</button></div>`;
   });
   sheet(`<h3 class="display">Ayarlar</h3><p class="sub">Konuları, adımları ve hatırlatma saatlerini buradan değiştir.</p>
     <div class="set"><h4>🔔 Hatırlatmalar</h4>${push}</div>${hs}
@@ -570,6 +572,7 @@ function settings() {
     if (a === 'add') { S.habits[i].steps.push({ id: rid(), label: 'Yeni adım', time: '18:00' }); save(); render(); return settings(); }
     if (a === 'del') { if (S.habits[i].steps.length < 2) return toast('En az bir adım kalmalı'); S.habits[i].steps.splice(j, 1); save(); render(); return settings(); }
     if (a === 'kind') { S.habits[i].kind = S.habits[i].kind === 'do' ? 'avoid' : 'do'; save(); render(); return settings(); }
+    if (a === 'goal') return goalSheet(S.habits[i]);
     if (a === 'reports') return reports();
     if (a === 'pushon') { await pushOn(); return settings(); }
     if (a === 'pushoff') { await pushOff(); return settings(); }
