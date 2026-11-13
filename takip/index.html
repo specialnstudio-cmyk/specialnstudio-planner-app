@@ -205,7 +205,7 @@ function render() {
     <div class="card hero"><img class="sun" src="sun.svg" alt="" style="transform:scale(${(0.72 + 0.28 * p).toFixed(2)});filter:saturate(${(0.25 + 0.75 * p).toFixed(2)})">
       <div><div class="pct display">${pctText(p)}<small>%</small></div><div class="say hand">${cheer(p, sel)}</div></div>
       <div class="bar"><i style="width:${p * 100}%;--c:var(--pink)"></i></div>
-      ${sel === t && p > 0.999 ? '<button class="btn pink brag" id="brag">Başarını paylaş 📸</button>' : ''}</div>`;
+      ${sel === t ? '<button class="btn pink brag" id="brag">Gününü paylaş 📸</button>' : ''}</div>`;
   h += `<div class="week"><button class="nav" data-week="-1" aria-label="Önceki hafta">‹</button>`;
   for (let i = 0; i < 7; i++) {
     const day = addDays(mon, i), dp = dayPct(day);
@@ -290,29 +290,45 @@ function party() {
 
 // ---------- share card (1080x1920, for stories) ----------
 async function brag() {
-  const W = 1080, H = 1920, c = document.createElement('canvas'), x = c.getContext('2d'), s = streak();
+  const W = 1080, H = 1920, c = document.createElement('canvas'), x = c.getContext('2d'), t = today(), now = nowHM(), p = dayPct(t);
   c.width = W; c.height = H;
   const img = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src; });
   const [zeb, sun] = await Promise.all([img('zebra.svg'), img('sun.svg')]);
-  try { await document.fonts.load("900 100px 'Big Shoulders Display'"); await document.fonts.load("100px 'Caveat Brush'"); } catch (e) { /* system fonts */ }
+  try { await document.fonts.load("900 100px 'Big Shoulders Display'"); await document.fonts.load("100px 'Caveat Brush'"); await document.fonts.load("700 30px 'Space Grotesk'"); } catch (e) { /* system fonts */ }
+  const D = "'Big Shoulders Display', 'Arial Narrow', sans-serif", G = "'Space Grotesk', sans-serif";
   x.fillStyle = '#2348C8'; x.fillRect(0, 0, W, H);
   if (zeb) x.drawImage(zeb, (W - H * 8 / 3) / 2, 0, H * 8 / 3, H);
-  const box = (bx, by, bw, bh, r, fill) => { x.fillStyle = '#2A1630'; x.beginPath(); x.roundRect(bx + 14, by + 14, bw, bh, r); x.fill();
-    x.fillStyle = fill; x.beginPath(); x.roundRect(bx, by, bw, bh, r); x.fill(); x.lineWidth = 9; x.strokeStyle = '#2A1630'; x.stroke(); };
-  box(90, 330, 900, 1180, 70, '#FFC93C');
-  x.fillStyle = '#FFF6E9'; x.beginPath(); x.arc(540, 610, 200, 0, 7); x.fill(); x.stroke();
-  if (sun) x.drawImage(sun, 345, 415, 390, 390);
-  x.textAlign = 'center'; x.fillStyle = '#2A1630';
-  x.font = "900 150px 'Big Shoulders Display', 'Arial Narrow', sans-serif"; x.fillText('BUGÜN', 540, 985);
-  x.font = "900 300px 'Big Shoulders Display', 'Arial Narrow', sans-serif"; x.fillStyle = '#FF3E8A'; x.fillText('%100', 540, 1245);
-  x.font = "76px 'Caveat Brush', cursive"; x.fillStyle = '#2A1630';
-  x.fillText(s > 1 ? `${s} gündür seri bozulmadı!` : 'Enerji bende!', 540, 1335);
-  x.font = "700 34px 'Space Grotesk', sans-serif"; S.habits.slice(0, 3).forEach((h, i) => x.fillText('✓ ' + h.name, 540, 1400 + i * 42, 800));
-  box(240, 1610, 600, 110, 55, '#2A1630');
-  x.fillStyle = '#FFF6E9'; x.font = "700 44px 'Space Grotesk', sans-serif"; x.fillText('S P E C I A L N S T U D I O', 540, 1681, 540);
-  x.fillStyle = '#FFF6E9'; x.font = "64px 'Caveat Brush', cursive"; x.fillText('Chase Your Energy · Etsy', 540, 1810);
+  const box = (bx, by, bw, bh, r, fill, sh = 14, lw = 9) => { if (sh) { x.fillStyle = '#2A1630'; x.beginPath(); x.roundRect(bx + sh, by + sh, bw, bh, r); x.fill(); }
+    x.fillStyle = fill; x.beginPath(); x.roundRect(bx, by, bw, bh, r); x.fill(); x.lineWidth = lw; x.strokeStyle = '#2A1630'; x.stroke(); };
+  box(70, 200, 940, 1400, 70, '#FFC93C');
+  x.fillStyle = '#FFF6E9'; x.beginPath(); x.arc(240, 400, 125, 0, 7); x.fill(); x.stroke();
+  if (sun) x.drawImage(sun, 118, 278, 244, 244);
+  const d = parse(t);
+  x.fillStyle = '#2A1630'; x.font = `900 84px ${D}`; x.fillText('BUGÜN', 410, 330);
+  x.font = `64px 'Caveat Brush', cursive`; x.fillStyle = '#E0177E'; x.textAlign = 'right'; x.fillText(`${d.getDate()} ${MONTHS[d.getMonth()]}`, 950, 325); x.textAlign = 'left';
+  x.fillStyle = '#FF3E8A'; x.font = `900 230px ${D}`; x.fillText(`%${pctText(p)}`, 404, 520);
+  // one row per check time: was the target of that time met, and the day's progress by then
+  const total = S.habits.reduce((n, h) => n + h.steps.length, 0), by = {};
+  for (const hb of S.habits) for (const st of hb.steps) (by[st.time] = by[st.time] || []).push(ans(t, hb, st));
+  const times = Object.keys(by).sort().slice(0, 10), top = 590, rh = Math.min(160, 970 / times.length);
+  let okSoFar = 0;
+  times.forEach((time, i) => {
+    const a = by[time], ok = a.every(v => v === 'ok'), slip = a.includes('slip'), open = time <= now, y = top + i * rh, bh = rh - 16;
+    okSoFar += a.filter(v => v === 'ok').length;
+    box(110, y, 860, bh, 24, ok ? '#FFFFFF' : slip ? '#ECE4EA' : '#FFF6E9', 0, 6);
+    x.fillStyle = ok ? '#138A4B' : slip ? '#8E1B3A' : '#B8A9B5'; x.beginPath(); x.arc(110 + bh / 2 + 4, y + bh / 2, bh * 0.3, 0, 7); x.fill();
+    x.fillStyle = '#FFFFFF'; x.font = `700 ${Math.round(bh * 0.36)}px ${G}`; x.textAlign = 'center'; x.fillText(ok ? '✓' : slip ? '✕' : '·', 110 + bh / 2 + 4, y + bh / 2 + bh * 0.13);
+    x.textAlign = 'left'; x.fillStyle = '#2A1630'; x.font = `900 ${Math.round(bh * 0.56)}px ${D}`; x.fillText(time, 110 + bh + 6, y + bh * 0.7); const tx = 110 + bh + 30 + x.measureText('00:00').width;
+    x.font = `700 ${Math.round(Math.min(bh * 0.3, 34))}px ${G}`;
+    x.fillText(ok ? 'Hedef tutturuldu' : slip ? 'Hedef kaçtı' : open ? 'Cevap bekliyor' : 'Sırada', tx, y + bh * (open || ok ? 0.44 : 0.62), 440);
+    if (open || ok) { x.fillStyle = '#E0177E'; x.fillText(`İlerleme oranı %${Math.round(okSoFar / total * 100)}`, tx, y + bh * 0.78, 440); }
+  });
+  x.textAlign = 'center';
+  box(240, 1670, 600, 110, 55, '#2A1630');
+  x.fillStyle = '#FFF6E9'; x.font = `700 44px ${G}`; x.fillText('S P E C I A L N S T U D I O', 540, 1741, 540);
+  x.font = "64px 'Caveat Brush', cursive"; x.fillText('Chase Your Energy · Etsy', 540, 1860);
   const url = c.toDataURL('image/png');
-  offer(new File([bytes(url)], 'bugun-100.png', { type: 'image/png' }), url, 'Başarı kartın hazır', 'Hikâyende ya da mesajda paylaş.');
+  offer(new File([bytes(url)], `gunum-${t}.png`, { type: 'image/png' }), url, 'Günün hazır', 'Hikâyende ya da mesajda paylaş.');
 }
 
 // ---------- 3-day report (PDF) ----------
