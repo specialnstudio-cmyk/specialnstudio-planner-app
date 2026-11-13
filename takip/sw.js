@@ -1,4 +1,4 @@
-const C = 'takip-v1';
+const C = 'takip-v2';
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(
   caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('takip-') && k !== C).map(k => caches.delete(k)))).then(() => self.clients.claim())));

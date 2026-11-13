@@ -93,6 +93,13 @@ button{cursor:pointer;touch-action:manipulation}
 .badge{width:46px;height:46px;border-radius:50%;border:3px solid var(--ink);background:#fff;display:flex;align-items:center;justify-content:center;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:18px;opacity:.45}
 .badge.on{background:var(--yellow);opacity:1;transform:rotate(-6deg)}
 .shop{display:block;width:max-content;margin:18px auto 0;padding:7px 14px;border-radius:999px;background:var(--ink);color:var(--cream);font-size:13px;font-weight:700;letter-spacing:.14em;text-decoration:none}
+.promo{display:flex;align-items:center;gap:12px;margin:18px 14px 0;padding:12px 14px;background:var(--yellow);color:var(--ink);text-decoration:none}
+.promo img{flex:none;width:56px;height:56px;background:var(--cream);border:3px solid var(--ink);border-radius:50%}
+.promo b{display:block;font-size:24px}
+.promo span{font-size:13px;line-height:1.25;display:block;margin-top:2px}
+.promo em{margin-left:auto;font-style:normal;font-size:24px}
+.brag{grid-column:1/-1;margin-top:10px;min-height:48px;font-size:16px;box-shadow:3px 3px 0 var(--ink)}
+.kind{margin:0 0 8px;border:2px solid var(--ink);border-radius:10px;background:var(--cream);font-weight:700;min-height:40px;padding:0 12px;width:100%;text-align:left}
 .foot{text-align:center;margin:22px 14px 0;font-size:20px;color:var(--pink)}
 
 /* sheets */
@@ -193,7 +200,8 @@ function render() {
     <div class="title"><b class="display">${sel === t ? 'Bugün' : esc(LONGDAYS[d.getDay()])}</b><span class="hand">${d.getDate()} ${MONTHS[d.getMonth()]}</span></div></div>
     <div class="card hero"><img class="sun" src="sun.svg" alt="" style="transform:scale(${(0.72 + 0.28 * p).toFixed(2)});filter:saturate(${(0.25 + 0.75 * p).toFixed(2)})">
       <div><div class="pct display">${pctText(p)}<small>%</small></div><div class="say hand">${cheer(p, sel)}</div></div>
-      <div class="bar"><i style="width:${p * 100}%;--c:var(--pink)"></i></div></div>`;
+      <div class="bar"><i style="width:${p * 100}%;--c:var(--pink)"></i></div>
+      ${sel === t && p > 0.999 ? '<button class="btn pink brag" id="brag">Başarını paylaş 📸</button>' : ''}</div>`;
   h += `<div class="week"><button class="nav" data-week="-1" aria-label="Önceki hafta">‹</button>`;
   for (let i = 0; i < 7; i++) {
     const day = addDays(mon, i), dp = dayPct(day);
@@ -219,7 +227,7 @@ function render() {
     <div class="g"><div class="l"><span>🔥 Seri: sıradaki hedef ${next} gün</span><b>${Math.min(s, next)}/${next}</b></div><div class="bar"><i style="width:${Math.min(s / next, 1) * 100}%;--c:var(--orange)"></i></div></div>
     <div class="g"><div class="l"><span>⭐ Bu hafta ${WEEK_GOAL} gün %100</span><b>${Math.min(wk, WEEK_GOAL)}/${WEEK_GOAL}</b></div><div class="bar"><i style="width:${Math.min(wk / WEEK_GOAL, 1) * 100}%;--c:var(--green)"></i></div></div>
     <div class="badges">${GOALS.map(g => `<span class="badge${b >= g ? ' on' : ''}" title="${g} günlük seri">${g}</span>`).join('')}</div></div>
-    <p class="foot hand">${b ? `En uzun serin: ${b} gün` : 'İlk %100 günün ilk rozetini açar'}</p><a class="shop" href="https://www.etsy.com/shop/SpecialNStudio?section_id=60970601" target="_blank" rel="noopener">SPECIALNSTUDIO</a>`;
+    <p class="foot hand">${b ? `En uzun serin: ${b} gün` : 'İlk %100 günün ilk rozetini açar'}</p><a class="card promo" href="https://www.etsy.com/shop/SpecialNStudio?section_id=60970601" target="_blank" rel="noopener"><img src="sun.svg" alt=""><div><b class="display">Chase Your Energy</b><span>Bu takibin renkli planlayıcıları SpecialNStudio'da. Göz at!</span></div><em>→</em></a><a class="shop" href="https://www.etsy.com/shop/SpecialNStudio?section_id=60970601" target="_blank" rel="noopener">SPECIALNSTUDIO</a>`;
   document.getElementById('app').innerHTML = h;
 }
 
@@ -227,6 +235,7 @@ document.getElementById('app').addEventListener('click', e => {
   const el = e.target.closest('button'); if (!el) return;
   if (el.id === 'gear') return settings();
   if (el.id === 'ask') return checkin();
+  if (el.id === 'brag') return brag();
   if (el.dataset.week) { const n = addDays(sel, 7 * el.dataset.week); sel = n > today() ? today() : n; return render(); }
   if (el.dataset.day) { sel = el.dataset.day; return render(); }
   if (el.dataset.h) {
@@ -273,6 +282,36 @@ function party() {
   }
 }
 
+// ---------- share card (1080x1920, for stories) ----------
+async function brag() {
+  const W = 1080, H = 1920, c = document.createElement('canvas'), x = c.getContext('2d'), s = streak();
+  c.width = W; c.height = H;
+  const img = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src; });
+  const [zeb, sun] = await Promise.all([img('zebra.svg'), img('sun.svg')]);
+  try { await document.fonts.load("900 100px 'Big Shoulders Display'"); await document.fonts.load("100px 'Caveat Brush'"); } catch (e) { /* system fonts */ }
+  x.fillStyle = '#2348C8'; x.fillRect(0, 0, W, H);
+  if (zeb) x.drawImage(zeb, (W - H * 8 / 3) / 2, 0, H * 8 / 3, H);
+  const box = (bx, by, bw, bh, r, fill) => { x.fillStyle = '#2A1630'; x.beginPath(); x.roundRect(bx + 14, by + 14, bw, bh, r); x.fill();
+    x.fillStyle = fill; x.beginPath(); x.roundRect(bx, by, bw, bh, r); x.fill(); x.lineWidth = 9; x.strokeStyle = '#2A1630'; x.stroke(); };
+  box(90, 330, 900, 1180, 70, '#FFC93C');
+  x.fillStyle = '#FFF6E9'; x.beginPath(); x.arc(540, 610, 200, 0, 7); x.fill(); x.stroke();
+  if (sun) x.drawImage(sun, 345, 415, 390, 390);
+  x.textAlign = 'center'; x.fillStyle = '#2A1630';
+  x.font = "900 150px 'Big Shoulders Display', 'Arial Narrow', sans-serif"; x.fillText('BUGÜN', 540, 985);
+  x.font = "900 300px 'Big Shoulders Display', 'Arial Narrow', sans-serif"; x.fillStyle = '#FF3E8A'; x.fillText('%100', 540, 1245);
+  x.font = "76px 'Caveat Brush', cursive"; x.fillStyle = '#2A1630';
+  x.fillText(s > 1 ? `${s} gündür seri bozulmadı!` : 'Enerji bende!', 540, 1335);
+  x.font = "700 34px 'Space Grotesk', sans-serif"; S.habits.slice(0, 3).forEach((h, i) => x.fillText('✓ ' + h.name, 540, 1400 + i * 42, 800));
+  box(240, 1610, 600, 110, 55, '#2A1630');
+  x.fillStyle = '#FFF6E9'; x.font = "700 44px 'Space Grotesk', sans-serif"; x.fillText('S P E C I A L N S T U D I O', 540, 1681, 540);
+  x.fillStyle = '#FFF6E9'; x.font = "64px 'Caveat Brush', cursive"; x.fillText('Chase Your Energy · Etsy', 540, 1810);
+  c.toBlob(async b => {
+    const f = new File([b], 'bugun-100.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f] }); } catch (e) { /* cancelled */ } return; }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = f.name; a.click(); toast('Kart indirildi 📸');
+  }, 'image/png');
+}
+
 // ---------- sheet + toast ----------
 const veil = document.getElementById('veil'), sheetEl = document.getElementById('sheet');
 let onPick = null;
@@ -299,7 +338,7 @@ function settings() {
   else push = `<p>Gün içinde "şimdiye kadar nasılsın?" diye sormam için bildirimleri aç.</p><button class="btn pink" data-a="pushon">Bildirimleri aç 🔔</button>`;
   let hs = '';
   S.habits.forEach((hb, i) => {
-    hs += `<div class="set"><h4>${i + 1}. konu · ${hb.kind === 'do' ? 'yapılacak' : 'uzak durulacak'}</h4>
+    hs += `<div class="set"><h4>${i + 1}. konu</h4><button class="kind" data-a="kind" data-i="${i}">Tür: ${hb.kind === 'do' ? '✅ Yapılacak (yaptın mı?)' : '🚫 Uzak durulacak (tükettin mi?)'} · değiştir</button>
       <div class="hname"><input type="text" value="${esc(hb.emoji)}" data-f="emoji" data-i="${i}" aria-label="Simge" maxlength="4">
       <input type="text" value="${esc(hb.name)}" data-f="name" data-i="${i}" aria-label="Konu adı" maxlength="40"></div>
       ${hb.steps.map((st, j) => `<div class="stp"><input value="${esc(st.label)}" data-f="label" data-i="${i}" data-j="${j}" aria-label="Adım adı" maxlength="24">
@@ -314,6 +353,7 @@ function settings() {
     if (a === 'close') return closeSheet();
     if (a === 'add') { S.habits[i].steps.push({ id: rid(), label: 'Yeni adım', time: '18:00' }); save(); render(); return settings(); }
     if (a === 'del') { if (S.habits[i].steps.length < 2) return toast('En az bir adım kalmalı'); S.habits[i].steps.splice(j, 1); save(); render(); return settings(); }
+    if (a === 'kind') { S.habits[i].kind = S.habits[i].kind === 'do' ? 'avoid' : 'do'; save(); render(); return settings(); }
     if (a === 'share') return share();
     if (a === 'pushon') { await pushOn(); return settings(); }
     if (a === 'pushoff') { await pushOff(); return settings(); }
@@ -339,7 +379,7 @@ function share() {
     for (let i = 0; i < 7; i++) { const d = addDays(mon, i); if (d > today()) break; for (const st of hb.steps) { all++; const a = ans(d, hb, st); if (a === 'ok') ok++; if (a === 'slip') slip++; } }
     txt += `${hb.emoji} ${hb.name}: %${all ? Math.round(ok / all * 100) : 0}${slip ? ` (${slip} kaçamak)` : ''}\n`;
   }
-  txt += `\n🔥 Seri: ${streak()} gün`;
+  txt += `\n🔥 Seri: ${streak()} gün\n\nGünlük Takip · Chase Your Energy, SpecialNStudio\nhttps://www.etsy.com/shop/SpecialNStudio?section_id=60970601`;
   if (navigator.share) navigator.share({ text: txt }).catch(() => {});
   else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(() => toast('Özet kopyalandı, mesaja yapıştır'));
 }
@@ -405,7 +445,7 @@ if (/[?&]c=1/.test(location.search)) { history.replaceState(null, '', './'); che
 else if (!S.welcomed) {
   S.welcomed = true; localStorage.setItem(KEY, JSON.stringify(S));
   sheet(`<h3 class="display">Hoş geldin!</h3><p class="sub">Üç konu, her gün tek hedef: <b>%100</b>.</p>
-    <div class="set"><p>☀️ Her adımı cevapladıkça barların dolar, güneş parlar.</p><p>⚡ Gün içinde "şimdiye kadar nasılsın?" diye sorarım. Tüketmediysen ilerlemen artar.</p><p>🔥 %100 günler seriyi büyütür, rozetleri açar.</p></div>
-    <button class="btn pink" data-a="go">Hatırlatmaları kur 🔔</button><button class="btn flat" data-a="x">Sonra</button>`, a => { if (a === 'go') settings(); else closeSheet(); });
+    <div class="set"><p>☀️ Her adımı cevapladıkça barların dolar, güneş parlar.</p><p>⚡ Gün içinde "şimdiye kadar nasılsın?" diye sorarım. Tüketmediysen ilerlemen artar.</p><p>🔥 %100 günler seriyi büyütür, rozetleri açar.</p><p>✏️ Hazır üç konu örnek. Ayarlar'dan kendi konularını, adımlarını ve saatlerini yaz.</p></div>
+    <button class="btn pink" data-a="go">Konularımı ve hatırlatmaları kur 🔔</button><button class="btn flat" data-a="x">Sonra</button>`, a => { if (a === 'go') settings(); else closeSheet(); });
 }
 </script></body></html>
