@@ -134,7 +134,8 @@ export class Habit extends DurableObject {
       .map(x => ({ time: x.time, title: String(x.title || "").slice(0, 80), body: String(x.body || "").slice(0, 200),
                    items: (Array.isArray(x.items) ? x.items : []).slice(0, 20).map(i => String(i).slice(0, 60)),
                    // a slot that comes round only every N days, counted from a start date (the report reminder)
-                   every: Math.min(Math.max(parseInt(x.every) || 1, 1), 60), from: /^\d{4}-\d\d-\d\d$/.test(x.from) ? x.from : "" }))
+                   every: Math.min(Math.max(parseInt(x.every) || 1, 1), 60), from: /^\d{4}-\d\d-\d\d$/.test(x.from) ? x.from : "",
+                   on: /^\d{4}-\d\d-\d\d$/.test(x.on) ? x.on : "" }))  // a slot for one date only (an hour goal reached)
       .sort((a, b2) => a.time < b2.time ? -1 : 1);
     rec.answered = { date: String((b.answered && b.answered.date) || "").slice(0, 10),
                      ids: ((b.answered && Array.isArray(b.answered.ids)) ? b.answered.ids : []).slice(0, 200).map(String) };
@@ -162,6 +163,7 @@ export class Habit extends DurableObject {
       rec.sent.ids.push(slot.time);
       // only a slot that just came due is announced (not one from hours ago), and only if something in it is still open
       if (minutes(now.time) - minutes(slot.time) > 20 || slot.items.every(i => answered.includes(i))) continue;
+      if (slot.on && slot.on !== now.date) continue;
       if (slot.every > 1 && (!slot.from || days(slot.from, now.date) < 1 || days(slot.from, now.date) % slot.every)) continue;
       const status = await this.push(rec.sub, { title: slot.title, body: slot.body, tag: "slot-" + slot.time });
       if (status === 404 || status === 410) { rec.sub = null; break; }  // the phone dropped the subscription
