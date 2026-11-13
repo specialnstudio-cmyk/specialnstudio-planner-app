@@ -1,0 +1,410 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Günlük Takip"><meta name="theme-color" content="#2348C8">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-512.png">
+<title>Günlük Takip</title>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Caveat+Brush&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#2A1630;--cream:#FFF6E9;--pink:#FF3E8A;--blue:#2348C8;--yellow:#FFC93C;--orange:#FF7A1A;--green:#138A4B;--lilac:#9B7BFF;--sky:#8CC8F0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--cream);color:var(--ink);font-family:'Space Grotesk',system-ui,sans-serif;-webkit-text-size-adjust:100%}
+body{min-height:100vh;min-height:100dvh;overflow-x:hidden}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation}
+.display{font-family:'Big Shoulders Display','Arial Narrow',sans-serif;font-weight:900;text-transform:uppercase;line-height:.9;letter-spacing:.01em}
+.hand{font-family:'Caveat Brush',cursive}
+#app{max-width:520px;margin:0 auto;padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+
+/* header */
+.top{position:relative;background:var(--blue) url(zebra.svg) center/cover;padding:calc(14px + env(safe-area-inset-top)) 16px 54px;border-bottom:3px solid var(--ink)}
+.top .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{background:var(--ink);color:var(--cream);font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
+.gear{width:44px;height:44px;border-radius:50%;border:3px solid var(--ink);background:var(--cream);font-size:20px;line-height:1;box-shadow:3px 3px 0 var(--ink)}
+.gear:active,.btn:active,.chip:active,.day:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.title{margin:14px 0 0;display:inline-block;background:var(--cream);border:3px solid var(--ink);border-radius:14px;padding:8px 14px 10px;box-shadow:4px 4px 0 var(--ink);transform:rotate(-2deg)}
+.title b{display:block;font-size:44px}
+.title span{font-size:20px;color:var(--pink)}
+
+/* hero */
+.card{background:#fff;border:3px solid var(--ink);border-radius:20px;box-shadow:5px 5px 0 var(--ink)}
+.hero{margin:-36px 14px 0;position:relative;background:var(--yellow);padding:14px 16px 16px;display:grid;grid-template-columns:104px 1fr;gap:6px 12px;align-items:center}
+.sun{width:104px;height:104px;background:var(--cream);border:3px solid var(--ink);border-radius:50%;transition:transform .6s cubic-bezier(.3,1.6,.5,1),filter .6s}
+.hero .pct{font-size:68px}
+.hero .pct small{font-size:34px}
+.hero .say{font-size:21px;line-height:1.05;margin-top:2px}
+.bar{height:20px;border:3px solid var(--ink);border-radius:999px;background:#fff;overflow:hidden;display:flex}
+.hero .bar{grid-column:1/-1;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--c,var(--pink));transition:width .5s cubic-bezier(.3,1.2,.5,1)}
+
+/* week */
+.week{margin:18px 14px 0;display:grid;grid-template-columns:28px repeat(7,1fr) 28px;gap:5px;align-items:end}
+.week .nav{height:52px;border:0;background:none;font-size:24px;font-weight:700;padding:0}
+.week .nav:disabled{opacity:.2}
+.day{position:relative;height:58px;border:3px solid var(--ink);border-radius:12px;background:#fff;padding:0;overflow:hidden;box-shadow:2px 2px 0 var(--ink)}
+.day i{position:absolute;left:0;right:0;bottom:0;background:var(--sky);transition:height .4s}
+.day.full i{background:var(--pink)}
+.day span{position:relative;display:block;font-size:11px;font-weight:700;letter-spacing:.06em}
+.day b{position:relative;display:block;font-size:19px;font-family:'Big Shoulders Display',sans-serif;font-weight:900}
+.day.sel{outline:3px solid var(--ink);outline-offset:2px}
+.day.today::before{content:"";position:absolute;z-index:1;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--ink)}
+.day.full b,.day.full span{color:#fff}
+.day:disabled{opacity:.35;box-shadow:none}
+
+/* ask banner */
+.ask{margin:16px 14px 0;width:calc(100% - 28px);text-align:left;background:var(--pink);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:12px;animation:wig 2.4s ease-in-out infinite}
+.ask b{font-size:26px;display:block}
+.ask span{font-size:14px}
+.ask em{margin-left:auto;font-style:normal;font-size:26px}
+@keyframes wig{0%,86%,100%{transform:rotate(0)}90%{transform:rotate(-1.4deg)}94%{transform:rotate(1.4deg)}}
+
+/* habits */
+.habit{margin:16px 14px 0;padding:14px 14px 12px}
+.habit .hd{display:flex;align-items:center;gap:10px}
+.habit .em{flex:none;width:46px;height:46px;border-radius:14px;border:3px solid var(--ink);background:var(--c);display:flex;align-items:center;justify-content:center;font-size:24px}
+.habit h2{margin:0;font-size:25px;flex:1}
+.habit .p{font-size:30px}
+.seg{display:flex;gap:4px;margin:12px 0 10px}
+.seg i{flex:1;height:22px;border:3px solid var(--ink);border-radius:8px;background:#fff;position:relative;overflow:hidden}
+.seg i::after{content:"";position:absolute;inset:0;background:var(--c);transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.3,1.3,.5,1)}
+.seg i.ok::after{transform:scaleX(1)}
+.seg i.slip{background:repeating-linear-gradient(135deg,#fff 0 5px,#d9cfd6 5px 9px)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{flex:1 1 calc(50% - 4px);min-height:48px;border:3px solid var(--ink);border-radius:12px;background:var(--cream);padding:6px 10px;text-align:left;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:2px 2px 0 var(--ink)}
+.chip small{display:block;font-weight:500;font-size:12px;opacity:.75}
+.chip .st{margin-left:auto;font-size:18px}
+.chip.ok{background:var(--c);color:#fff}
+.chip.c-light.ok{color:var(--ink)}
+.chip.slip{background:#ece4ea}
+.chip.wait{opacity:.5;box-shadow:none}
+.chip.due{border-style:dashed}
+.note{margin:10px 2px 0;font-size:18px;line-height:1.1}
+
+/* goals */
+.goals{margin:18px 14px 0;padding:14px;background:var(--lilac)}
+.goals h3{margin:0 0 8px;font-size:26px;color:#fff}
+.goals .g{background:#fff;border:3px solid var(--ink);border-radius:14px;padding:10px 12px;margin-top:8px}
+.goals .g .l{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:15px;margin-bottom:6px}
+.goals .g .l b{font-family:'Big Shoulders Display',sans-serif;font-size:22px}
+.goals .bar{height:16px}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.badge{width:46px;height:46px;border-radius:50%;border:3px solid var(--ink);background:#fff;display:flex;align-items:center;justify-content:center;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:18px;opacity:.45}
+.badge.on{background:var(--yellow);opacity:1;transform:rotate(-6deg)}
+.foot{text-align:center;margin:22px 14px 0;font-size:20px;color:var(--pink)}
+
+/* sheets */
+.veil{position:fixed;inset:0;background:rgba(42,22,48,.55);display:none;align-items:flex-end;justify-content:center;z-index:10}
+.veil.on{display:flex}
+.sheet{width:100%;max-width:520px;max-height:92dvh;overflow:auto;background:var(--cream);border:3px solid var(--ink);border-bottom:0;border-radius:24px 24px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));animation:up .25s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.sheet h3{margin:0 0 4px;font-size:34px}
+.sheet .sub{font-size:15px;margin:0 0 14px}
+.q .tag{display:inline-block;background:var(--ink);color:var(--cream);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:999px;margin-bottom:10px}
+.q .big{font-size:38px;margin:0 0 6px}
+.btn{display:block;width:100%;min-height:56px;border:3px solid var(--ink);border-radius:16px;background:#fff;font-weight:700;font-size:18px;padding:10px 14px;margin-top:10px;box-shadow:4px 4px 0 var(--ink)}
+.btn.yes{background:var(--green);color:#fff}
+.btn.pink{background:var(--pink);color:#fff}
+.btn.flat{box-shadow:none;border-color:transparent;background:none;min-height:44px;font-size:15px;text-decoration:underline}
+.set{background:#fff;border:3px solid var(--ink);border-radius:16px;padding:12px;margin-top:12px}
+.set h4{margin:0 0 8px;font-size:15px;letter-spacing:.08em;text-transform:uppercase}
+.set p{margin:0 0 8px;font-size:14px;line-height:1.35}
+.set input[type=text]{width:100%;border:2px solid var(--ink);border-radius:10px;padding:9px 10px;background:var(--cream);font-weight:700;font-size:16px}
+.stp{display:grid;grid-template-columns:1fr 104px 40px;gap:6px;margin-top:6px}
+.stp input{min-width:0;border:2px solid var(--ink);border-radius:10px;padding:8px;background:#fff;font-size:16px}
+.stp button,.add{border:2px solid var(--ink);border-radius:10px;background:var(--cream);font-weight:700;min-height:40px}
+.add{margin-top:8px;padding:0 12px}
+.hname{display:grid;grid-template-columns:56px 1fr;gap:6px}
+.toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translate(-50%,30px);background:var(--ink);color:var(--cream);padding:12px 18px;border-radius:999px;font-weight:700;font-size:15px;opacity:0;transition:.3s;z-index:30;max-width:92vw;text-align:center;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.conf{position:fixed;top:-20px;width:12px;height:18px;z-index:40;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div id="app"></div>
+<div class="veil" id="veil"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+'use strict';
+const KEY = 'takip.v1', API = 'api/';
+const DAYS = ['PZT', 'SAL', 'ÇAR', 'PER', 'CUM', 'CMT', 'PAZ'];
+const MONTHS = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+const LONGDAYS = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+const GOALS = [1, 3, 7, 14, 21, 30, 60, 100];
+const WEEK_GOAL = 5;
+const LIGHT = ['#FFC93C', '#8CC8F0', '#9BE8B4', '#FFE066'];
+const avoidSteps = () => [['Öğlene kadar', '12:30'], ['İkindiye kadar', '16:30'], ['Akşama kadar', '20:30'], ['Gün sonu', '22:30']].map(([label, time]) => ({ id: rid(), label, time }));
+function rid() { return Math.random().toString(36).slice(2, 8); }
+function hex(n) { return Array.from(crypto.getRandomValues(new Uint8Array(n)), b => b.toString(16).padStart(2, '0')).join(''); }
+
+function fresh() {
+  return { uid: hex(16), push: false, days: {}, habits: [
+    { id: rid(), name: 'Takviyelerimi aldım', emoji: '💊', kind: 'do', color: '#FF3E8A', steps: [{ id: rid(), label: 'Sabah', time: '09:00' }, { id: rid(), label: 'Akşam', time: '21:00' }] },
+    { id: rid(), name: 'Gluten ve laktoz yok', emoji: '🌾', kind: 'avoid', color: '#2348C8', steps: avoidSteps() },
+    { id: rid(), name: 'Paketli abur cubur yok', emoji: '🍪', kind: 'avoid', color: '#FF7A1A', steps: avoidSteps() },
+  ] };
+}
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { /* first run */ }
+if (!S || !S.habits) S = fresh();
+function save() { localStorage.setItem(KEY, JSON.stringify(S)); sync(); }
+
+// ---------- dates ----------
+function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function parse(s) { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
+function addDays(s, n) { const d = parse(s); d.setDate(d.getDate() + n); return iso(d); }
+function today() { return iso(new Date()); }
+function nowHM() { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function monday(s) { const d = parse(s); return addDays(s, -((d.getDay() + 6) % 7)); }
+let sel = today(), seenToday = today();
+
+// ---------- progress ----------
+const key = (h, st) => h.id + '.' + st.id;
+function ans(date, h, st) { return (S.days[date] || {})[key(h, st)]; }
+function habitPct(date, h) { return h.steps.length ? h.steps.filter(st => ans(date, h, st) === 'ok').length / h.steps.length : 0; }
+function dayPct(date) { return S.habits.length ? S.habits.reduce((n, h) => n + habitPct(date, h), 0) / S.habits.length : 0; }
+function full(date) { return dayPct(date) > 0.999; }
+function isOpen(date, h, st) { return date < today() || (date === today() && (h.kind === 'do' || st.time <= nowHM())); }
+function isDue(date, h, st) { return date === today() && st.time <= nowHM() && !ans(date, h, st); }
+function pending() { const out = []; for (const h of S.habits) for (const st of h.steps) if (isDue(today(), h, st)) out.push([h, st]); return out.sort((a, b) => a[1].time < b[1].time ? -1 : 1); }
+function streak() { let d = today(), n = 0; if (!full(d)) d = addDays(d, -1); while (full(d)) { n++; d = addDays(d, -1); } return n; }
+function best() {
+  let b = 0, run = 0, prev = '';
+  for (const d of Object.keys(S.days).sort()) { if (full(d)) { run = prev && addDays(prev, 1) === d ? run + 1 : 1; prev = d; b = Math.max(b, run); } }
+  return b;
+}
+function pctText(p) { return Math.round(p * 100); }
+function cheer(p, date) {
+  if (date !== today()) return p > 0.999 ? 'Tam puanlı bir gündü!' : p > 0 ? 'Geçmiş gün, eksikleri tamamlayabilirsin.' : 'Bu gün boş kalmış.';
+  if (p > 0.999) return 'Bugün %100! Enerji sende ⚡';
+  if (p >= 0.75) return 'Son düzlük, az kaldı!';
+  if (p >= 0.5) return 'Yarıyı geçtin, harika gidiyorsun!';
+  if (p > 0) return 'Güzel başladın, devam!';
+  return 'Güneşi birlikte dolduralım!';
+}
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+// ---------- main screen ----------
+function render() {
+  const t = today(), p = dayPct(sel), d = parse(sel), mon = monday(sel), pend = sel === t ? pending() : [];
+  let h = `<div class="top"><div class="row"><span class="brand">Chase Your Energy</span><button class="gear" id="gear" aria-label="Ayarlar">⚙️</button></div>
+    <div class="title"><b class="display">${sel === t ? 'Bugün' : esc(LONGDAYS[d.getDay()])}</b><span class="hand">${d.getDate()} ${MONTHS[d.getMonth()]}</span></div></div>
+    <div class="card hero"><img class="sun" src="sun.svg" alt="" style="transform:scale(${(0.72 + 0.28 * p).toFixed(2)});filter:saturate(${(0.25 + 0.75 * p).toFixed(2)})">
+      <div><div class="pct display">${pctText(p)}<small>%</small></div><div class="say hand">${cheer(p, sel)}</div></div>
+      <div class="bar"><i style="width:${p * 100}%;--c:var(--pink)"></i></div></div>`;
+  h += `<div class="week"><button class="nav" data-week="-1" aria-label="Önceki hafta">‹</button>`;
+  for (let i = 0; i < 7; i++) {
+    const day = addDays(mon, i), dp = dayPct(day);
+    h += `<button class="day${day === sel ? ' sel' : ''}${day === t ? ' today' : ''}${dp > 0.999 ? ' full' : ''}" data-day="${day}" ${day > t ? 'disabled' : ''}>
+      <i style="height:${dp * 100}%"></i><span>${DAYS[i]}</span><b>${parse(day).getDate()}</b></button>`;
+  }
+  h += `<button class="nav" data-week="1" aria-label="Sonraki hafta" ${addDays(mon, 7) > t ? 'disabled' : ''}>›</button></div>`;
+  if (pend.length) h += `<button class="card ask" id="ask"><div><b class="display">Şimdiye kadar nasılsın?</b><span>${pend.length} soru seni bekliyor, cevapla, barın dolsun</span></div><em>→</em></button>`;
+  for (const hb of S.habits) {
+    const hp = habitPct(sel, hb), slip = hb.steps.some(st => ans(sel, hb, st) === 'slip'), light = LIGHT.includes(hb.color);
+    h += `<div class="card habit" style="--c:${hb.color}"><div class="hd"><span class="em">${esc(hb.emoji)}</span><h2 class="display">${esc(hb.name)}</h2><span class="p display">${pctText(hp)}%</span></div>
+      <div class="seg">${hb.steps.map(st => `<i class="${ans(sel, hb, st) || ''}"></i>`).join('')}</div><div class="chips">`;
+    for (const st of hb.steps) {
+      const a = ans(sel, hb, st), open = isOpen(sel, hb, st), due = isDue(sel, hb, st);
+      h += `<button class="chip ${a || ''}${light ? ' c-light' : ''}${open ? '' : ' wait'}${due ? ' due' : ''}" data-h="${hb.id}" data-s="${st.id}">
+        <span>${esc(st.label)}<small>${st.time}</small></span><span class="st">${a === 'ok' ? '✓' : a === 'slip' ? '✕' : open ? (due ? '?' : '○') : '🔒'}</span></button>`;
+    }
+    h += `</div>${slip ? `<p class="note hand">Bir kaçamak oldu, olur böyle şeyler. Kalan adımlar hâlâ senin!</p>` : hp > 0.999 ? `<p class="note hand" style="color:${light ? 'var(--ink)' : hb.color}">Tamamlandı, bravo!</p>` : ''}</div>`;
+  }
+  const s = streak(), b = best(), next = GOALS.find(g => g > s) || GOALS[GOALS.length - 1];
+  let wk = 0; for (let i = 0; i < 7; i++) if (full(addDays(monday(t), i))) wk++;
+  h += `<div class="card goals"><h3 class="display">Hedefler</h3>
+    <div class="g"><div class="l"><span>🔥 Seri: sıradaki hedef ${next} gün</span><b>${Math.min(s, next)}/${next}</b></div><div class="bar"><i style="width:${Math.min(s / next, 1) * 100}%;--c:var(--orange)"></i></div></div>
+    <div class="g"><div class="l"><span>⭐ Bu hafta ${WEEK_GOAL} gün %100</span><b>${Math.min(wk, WEEK_GOAL)}/${WEEK_GOAL}</b></div><div class="bar"><i style="width:${Math.min(wk / WEEK_GOAL, 1) * 100}%;--c:var(--green)"></i></div></div>
+    <div class="badges">${GOALS.map(g => `<span class="badge${b >= g ? ' on' : ''}" title="${g} günlük seri">${g}</span>`).join('')}</div></div>
+    <p class="foot hand">${b ? `En uzun serin: ${b} gün` : 'İlk %100 günün ilk rozetini açar'}</p>`;
+  document.getElementById('app').innerHTML = h;
+}
+
+document.getElementById('app').addEventListener('click', e => {
+  const el = e.target.closest('button'); if (!el) return;
+  if (el.id === 'gear') return settings();
+  if (el.id === 'ask') return checkin();
+  if (el.dataset.week) { const n = addDays(sel, 7 * el.dataset.week); sel = n > today() ? today() : n; return render(); }
+  if (el.dataset.day) { sel = el.dataset.day; return render(); }
+  if (el.dataset.h) {
+    const hb = S.habits.find(x => x.id === el.dataset.h), st = hb.steps.find(x => x.id === el.dataset.s);
+    if (!isOpen(sel, hb, st)) return toast(`Bu adım ${st.time}'da açılır ⏰`);
+    ask([[hb, st]], sel);
+  }
+});
+
+// ---------- questions ----------
+function question(hb, st) {
+  if (hb.kind === 'do') return { q: `${st.label}: tamam mı?`, yes: 'Evet, yaptım ✓', no: 'Henüz değil', noVal: null };
+  return { q: 'Tükettin mi?', yes: 'Tüketmedim 💪', no: 'Tükettim', noVal: 'slip' };
+}
+function ask(queue, date, i = 0) {
+  if (i >= queue.length) { closeSheet(); return; }
+  const [hb, st] = queue[i], q = question(hb, st), cur = ans(date, hb, st);
+  sheet(`<div class="q"><span class="tag">${esc(hb.emoji)} ${esc(hb.name)}${queue.length > 1 ? ` · ${i + 1}/${queue.length}` : ''}</span>
+    <p class="big display">${hb.kind === 'do' ? esc(q.q) : `${esc(st.label)} ${st.time}: tükettin mi?`}</p>
+    <p class="sub">${hb.kind === 'do' ? 'Tik at, barın dolsun.' : 'Tüketmediysen ilerlemen artıyor.'}</p>
+    <button class="btn yes" data-a="ok">${q.yes}</button><button class="btn" data-a="no">${q.no}</button>
+    ${cur ? '<button class="btn flat" data-a="clear">Cevabı sil</button>' : ''}</div>`, a => {
+    const was = full(date), day = S.days[date] || (S.days[date] = {});
+    if (a === 'ok') day[key(hb, st)] = 'ok';
+    else if (a === 'clear' || q.noVal === null) delete day[key(hb, st)];
+    else day[key(hb, st)] = q.noVal;
+    save(); render();
+    if (!was && full(date)) { closeSheet(); return party(); }
+    if (i + 1 >= queue.length) {
+      closeSheet();
+      toast(a === 'ok' ? ['Süpersin! ⚡', 'İşte bu! 🎉', 'Bar doluyor! 💪', 'Tam gaz devam! ☀️'][Math.floor(Math.random() * 4)] : a === 'no' && q.noVal ? 'Dürüstlük de bir başarı. Devam! 💛' : 'Kaydedildi');
+    } else ask(queue, date, i + 1);
+  });
+}
+function checkin() { const p = pending(); sel = today(); render(); if (p.length) ask(p, today()); else toast('Şu an bekleyen soru yok ☀️'); }
+
+function party() {
+  toast('BUGÜN %100! 🎉 Enerji sende!');
+  const cols = ['#FF3E8A', '#2348C8', '#FFC93C', '#138A4B', '#9B7BFF', '#FF7A1A'];
+  for (let i = 0; i < 70; i++) {
+    const c = document.createElement('i'); c.className = 'conf';
+    c.style.cssText = `left:${Math.random() * 100}vw;background:${cols[i % 6]};animation-duration:${1.6 + Math.random() * 1.8}s;animation-delay:${Math.random() * 0.5}s;border-radius:${i % 3 ? 2 : 9}px`;
+    document.body.appendChild(c); setTimeout(() => c.remove(), 4200);
+  }
+}
+
+// ---------- sheet + toast ----------
+const veil = document.getElementById('veil'), sheetEl = document.getElementById('sheet');
+let onPick = null;
+function sheet(html, pick) { sheetEl.innerHTML = html; onPick = pick || null; veil.classList.add('on'); }
+function closeSheet() { veil.classList.remove('on'); onPick = null; }
+veil.addEventListener('click', e => {
+  if (e.target === veil) return closeSheet();
+  const b = e.target.closest('[data-a]'); if (b && onPick) onPick(b.dataset.a, b);
+});
+let toastT;
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2600); }
+
+// ---------- settings ----------
+const iOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const canPush = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+function settings() {
+  let push;
+  if (!canPush && iOS && !standalone) push = `<p><b>iPhone'da önce ana ekrana ekle:</b> Safari'de alttaki Paylaş düğmesine dokun, "Ana Ekrana Ekle"yi seç. Sonra uygulamayı ana ekrandan aç ve buraya geri gel.</p>`;
+  else if (!canPush) push = `<p>Bu tarayıcı bildirim göndermeyi desteklemiyor. Telefonda Safari (iPhone) ya da Chrome (Android) ile aç.</p>`;
+  else if (Notification.permission === 'denied') push = `<p>Bildirim izni kapalı. Telefonun Ayarlar bölümünden bu uygulamanın bildirimlerine izin ver.</p>`;
+  else if (S.push && Notification.permission === 'granted') push = `<p>Bildirimler <b>açık</b>. Adım saatlerinde haber veriyorum, cevapladığın adım için rahatsız etmiyorum.</p>
+    <button class="btn" data-a="test">Deneme bildirimi gönder</button><button class="btn flat" data-a="pushoff">Bildirimleri kapat</button>`;
+  else push = `<p>Gün içinde "şimdiye kadar nasılsın?" diye sormam için bildirimleri aç.</p><button class="btn pink" data-a="pushon">Bildirimleri aç 🔔</button>`;
+  let hs = '';
+  S.habits.forEach((hb, i) => {
+    hs += `<div class="set"><h4>${i + 1}. konu · ${hb.kind === 'do' ? 'yapılacak' : 'uzak durulacak'}</h4>
+      <div class="hname"><input type="text" value="${esc(hb.emoji)}" data-f="emoji" data-i="${i}" aria-label="Simge" maxlength="4">
+      <input type="text" value="${esc(hb.name)}" data-f="name" data-i="${i}" aria-label="Konu adı" maxlength="40"></div>
+      ${hb.steps.map((st, j) => `<div class="stp"><input value="${esc(st.label)}" data-f="label" data-i="${i}" data-j="${j}" aria-label="Adım adı" maxlength="24">
+        <input type="time" value="${st.time}" data-f="time" data-i="${i}" data-j="${j}" aria-label="Saat"><button data-a="del" data-i="${i}" data-j="${j}" aria-label="Adımı sil">✕</button></div>`).join('')}
+      <button class="add" data-a="add" data-i="${i}">+ Adım ekle</button></div>`;
+  });
+  sheet(`<h3 class="display">Ayarlar</h3><p class="sub">Konuları, adımları ve hatırlatma saatlerini buradan değiştir.</p>
+    <div class="set"><h4>🔔 Hatırlatmalar</h4>${push}</div>${hs}
+    <div class="set"><h4>📤 Koçuna gönder</h4><p>Bu haftanın özetini mesaj olarak paylaş.</p><button class="btn" data-a="share">Haftalık özeti paylaş</button></div>
+    <button class="btn yes" data-a="close">Tamam</button>`, async (a, b) => {
+    const i = +b.dataset.i, j = +b.dataset.j;
+    if (a === 'close') return closeSheet();
+    if (a === 'add') { S.habits[i].steps.push({ id: rid(), label: 'Yeni adım', time: '18:00' }); save(); render(); return settings(); }
+    if (a === 'del') { if (S.habits[i].steps.length < 2) return toast('En az bir adım kalmalı'); S.habits[i].steps.splice(j, 1); save(); render(); return settings(); }
+    if (a === 'share') return share();
+    if (a === 'pushon') { await pushOn(); return settings(); }
+    if (a === 'pushoff') { await pushOff(); return settings(); }
+    if (a === 'test') { const r = await api('test'); toast(r && r.ok ? 'Gönderildi, birazdan gelir 🔔' : 'Gönderilemedi, bildirimleri kapatıp yeniden aç'); }
+  });
+}
+sheetEl.addEventListener('change', e => {
+  const el = e.target, f = el.dataset.f; if (!f) return;
+  const hb = S.habits[+el.dataset.i], v = el.value.trim();
+  if (f === 'name' || f === 'emoji') { if (v) hb[f] = v; }
+  else if (f === 'label') { if (v) hb.steps[+el.dataset.j].label = v; }
+  else if (/^\d\d:\d\d$/.test(v)) { hb.steps[+el.dataset.j].time = v; hb.steps.sort((a, b) => a.time < b.time ? -1 : 1); }
+  save(); render();
+});
+
+function share() {
+  const mon = monday(today());
+  let txt = `Haftalık takip (${parse(mon).getDate()} ${MONTHS[parse(mon).getMonth()]} haftası)\n`;
+  for (let i = 0; i < 7; i++) { const d = addDays(mon, i); if (d > today()) break; txt += `${DAYS[i]}: %${pctText(dayPct(d))}${full(d) ? ' ⭐' : ''}\n`; }
+  txt += '\n';
+  for (const hb of S.habits) {
+    let ok = 0, all = 0, slip = 0;
+    for (let i = 0; i < 7; i++) { const d = addDays(mon, i); if (d > today()) break; for (const st of hb.steps) { all++; const a = ans(d, hb, st); if (a === 'ok') ok++; if (a === 'slip') slip++; } }
+    txt += `${hb.emoji} ${hb.name}: %${all ? Math.round(ok / all * 100) : 0}${slip ? ` (${slip} kaçamak)` : ''}\n`;
+  }
+  txt += `\n🔥 Seri: ${streak()} gün`;
+  if (navigator.share) navigator.share({ text: txt }).catch(() => {});
+  else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(() => toast('Özet kopyalandı, mesaja yapıştır'));
+}
+
+// ---------- reminders ----------
+function slots() {
+  const by = {};
+  for (const hb of S.habits) for (const st of hb.steps) (by[st.time] = by[st.time] || []).push([hb, st]);
+  const times = Object.keys(by).sort();
+  return times.map((time, n) => {
+    const list = by[time], dos = list.filter(x => x[0].kind === 'do'), av = list.filter(x => x[0].kind !== 'do');
+    const names = l => l.map(x => x[0].name).join(', ');
+    let title, body;
+    if (!av.length) { title = `${dos[0][0].emoji} ${dos[0][1].label}: ${dos[0][0].name}`; body = 'Tamamsa dokun, tik at, barın dolsun.'; }
+    else if (n === times.length - 1) { title = '🌙 Günü kapatma zamanı'; body = `Son tikleri at, bugünü %100 kapat. ${names(list)}`; }
+    else { title = '⚡ Şimdiye kadar nasılsın?'; body = `${names(av)}: tüketmediysen ilerlemen artıyor.${dos.length ? ` Bir de: ${names(dos)}.` : ''} Dokun, işaretle.`; }
+    return { time, title, body, items: list.map(x => key(x[0], x[1])) };
+  });
+}
+async function api(action, body) {
+  try { const r = await fetch(API + S.uid + '/' + action, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body || {}) }); return await r.json(); }
+  catch (e) { return null; }
+}
+let syncT;
+function sync() { clearTimeout(syncT); syncT = setTimeout(doSync, 600); }
+async function doSync() {
+  if (!S.push || !canPush) return;
+  const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription();
+  await api('sync', { sub: sub ? sub.toJSON() : null, tz: Intl.DateTimeFormat().resolvedOptions().timeZone, slots: slots(),
+    answered: { date: today(), ids: Object.keys(S.days[today()] || {}) } });
+}
+function b64u(s) { return Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0)); }
+async function pushOn() {
+  try {
+    if (await Notification.requestPermission() !== 'granted') return toast('Bildirim izni verilmedi');
+    const k = await api('key'); if (!k || !k.key) return toast('Sunucuya ulaşılamadı, internetini kontrol et');
+    const reg = await navigator.serviceWorker.ready;
+    const old = await reg.pushManager.getSubscription(); if (old) await old.unsubscribe();
+    await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(k.key) });
+    S.push = true; localStorage.setItem(KEY, JSON.stringify(S)); await doSync();
+    toast('Bildirimler açıldı 🔔');
+  } catch (e) { toast('Bildirim açılamadı: ' + (e.message || e)); }
+}
+async function pushOff() {
+  try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (sub) await sub.unsubscribe(); } catch (e) { /* nothing to drop */ }
+  await api('sync', { sub: null, slots: [] });
+  S.push = false; localStorage.setItem(KEY, JSON.stringify(S)); toast('Bildirimler kapatıldı');
+}
+
+// ---------- start ----------
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.checkin) checkin(); });
+}
+function tick() {
+  if (today() !== seenToday) { if (sel === seenToday) sel = today(); seenToday = today(); }
+  if (!veil.classList.contains('on')) render();
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { tick(); sync(); } });
+setInterval(tick, 30000);
+render(); sync();
+if (/[?&]c=1/.test(location.search)) { history.replaceState(null, '', './'); checkin(); }
+else if (!S.welcomed) {
+  S.welcomed = true; localStorage.setItem(KEY, JSON.stringify(S));
+  sheet(`<h3 class="display">Hoş geldin!</h3><p class="sub">Üç konu, her gün tek hedef: <b>%100</b>.</p>
+    <div class="set"><p>☀️ Her adımı cevapladıkça barların dolar, güneş parlar.</p><p>⚡ Gün içinde "şimdiye kadar nasılsın?" diye sorarım. Tüketmediysen ilerlemen artar.</p><p>🔥 %100 günler seriyi büyütür, rozetleri açar.</p></div>
+    <button class="btn pink" data-a="go">Hatırlatmaları kur 🔔</button><button class="btn flat" data-a="x">Sonra</button>`, a => { if (a === 'go') settings(); else closeSheet(); });
+}
+</script></body></html>
