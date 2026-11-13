@@ -591,21 +591,16 @@ function slots() {
   for (const hb of S.habits) for (const st of hb.steps) (by[st.time] = by[st.time] || []).push([hb, st]);
   const times = Object.keys(by).sort();
   const out = times.map((time, n) => {
-    const list = by[time], dos = list.filter(x => x[0].kind === 'do'), av = list.filter(x => x[0].kind !== 'do');
-    const names = l => l.map(x => x[0].name).join(', ');
-    let title, body;
-    if (!av.length) { title = `${dos[0][0].emoji} ${dos[0][1].label}: ${dos[0][0].name}`; body = 'Tamamsa dokun, tik at, barın dolsun.'; }
-    else if (n === times.length - 1) { title = '🌙 Günü kapatma zamanı'; body = `Son tikleri at, bugünü %100 kapat. ${names(list)}`; }
-    else { title = '⚡ Şimdiye kadar nasılsın?'; body = `${names(av)}: tüketmediysen ilerlemen artıyor.${dos.length ? ` Bir de: ${names(dos)}.` : ''} Dokun, işaretle.`; }
-    return { time, title, body, items: list.map(x => key(x[0], x[1])) };
+    const list = by[time], kind = list.every(x => x[0].kind === 'do') ? 'do' : n === times.length - 1 ? 'close' : 'ask';
+    return { time, kind, items: list.map(x => key(x[0], x[1])) };  // no topic names leave the phone
   });
   for (const hb of S.habits) {
     const g = goalInfo(hb); if (!g || g.done || !g.eta || iso(new Date(g.eta)) !== today()) continue;
     let m = new Date(g.eta).getHours() * 60 + new Date(g.eta).getMinutes(); while (by[hm(m)] && m < 1439) m++;
-    by[hm(m)] = []; out.push({ time: hm(m), title: '🎯 Hedef tamam!', body: `${hb.name}: ${hb.goal.n} saatlik hedefini tutturdun. Bravo!`, items: ['goal'], on: today() });
+    by[hm(m)] = []; out.push({ time: hm(m), kind: 'goal', items: ['goal'], on: today() });
   }
   let rt = 10 * 60; while (by[hm(rt)]) rt++;
-  out.push({ time: hm(rt), title: '📄 3 günlük raporun hazır', body: 'Dokun, PDF raporunu koçuna WhatsApp\'tan gönder.', items: ['report'], every: 3, from: S.reportFrom });
+  out.push({ time: hm(rt), kind: 'report', items: ['report'], every: 3, from: S.reportFrom });
   return out;
 }
 async function api(action, body) {
