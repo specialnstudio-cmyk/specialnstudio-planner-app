@@ -92,6 +92,7 @@ button{cursor:pointer;touch-action:manipulation}
 .badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .badge{width:46px;height:46px;border-radius:50%;border:3px solid var(--ink);background:#fff;display:flex;align-items:center;justify-content:center;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:18px;opacity:.45}
 .badge.on{background:var(--yellow);opacity:1;transform:rotate(-6deg)}
+.shop{display:block;width:max-content;margin:18px auto 0;padding:7px 14px;border-radius:999px;background:var(--ink);color:var(--cream);font-size:13px;font-weight:700;letter-spacing:.14em;text-decoration:none}
 .foot{text-align:center;margin:22px 14px 0;font-size:20px;color:var(--pink)}
 
 /* sheets */
@@ -218,7 +219,7 @@ function render() {
     <div class="g"><div class="l"><span>🔥 Seri: sıradaki hedef ${next} gün</span><b>${Math.min(s, next)}/${next}</b></div><div class="bar"><i style="width:${Math.min(s / next, 1) * 100}%;--c:var(--orange)"></i></div></div>
     <div class="g"><div class="l"><span>⭐ Bu hafta ${WEEK_GOAL} gün %100</span><b>${Math.min(wk, WEEK_GOAL)}/${WEEK_GOAL}</b></div><div class="bar"><i style="width:${Math.min(wk / WEEK_GOAL, 1) * 100}%;--c:var(--green)"></i></div></div>
     <div class="badges">${GOALS.map(g => `<span class="badge${b >= g ? ' on' : ''}" title="${g} günlük seri">${g}</span>`).join('')}</div></div>
-    <p class="foot hand">${b ? `En uzun serin: ${b} gün` : 'İlk %100 günün ilk rozetini açar'}</p>`;
+    <p class="foot hand">${b ? `En uzun serin: ${b} gün` : 'İlk %100 günün ilk rozetini açar'}</p><a class="shop" href="https://www.etsy.com/shop/SpecialNStudio?section_id=60970601" target="_blank" rel="noopener">SPECIALNSTUDIO</a>`;
   document.getElementById('app').innerHTML = h;
 }
 
@@ -275,7 +276,7 @@ function party() {
 // ---------- sheet + toast ----------
 const veil = document.getElementById('veil'), sheetEl = document.getElementById('sheet');
 let onPick = null;
-function sheet(html, pick) { sheetEl.innerHTML = html; onPick = pick || null; veil.classList.add('on'); }
+function sheet(html, pick) { sheetEl.innerHTML = html + '<a class="shop" href="https://www.etsy.com/shop/SpecialNStudio?section_id=60970601" target="_blank" rel="noopener">SPECIALNSTUDIO</a>'; onPick = pick || null; veil.classList.add('on'); }
 function closeSheet() { veil.classList.remove('on'); onPick = null; }
 veil.addEventListener('click', e => {
   if (e.target === veil) return closeSheet();
