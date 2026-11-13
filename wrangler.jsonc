@@ -6,10 +6,10 @@
     "directory": "./",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
-    "run_worker_first": ["/p/*", "/__admin/*"]
+    "run_worker_first": ["/p/*", "/__admin/*", "/takip/api/*"]
   },
-  "durable_objects": { "bindings": [{ "name": "GATE", "class_name": "Gate" }] },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Gate"] }],
+  "durable_objects": { "bindings": [{ "name": "GATE", "class_name": "Gate" }, { "name": "HABIT", "class_name": "Habit" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Gate"] }, { "tag": "v2", "new_sqlite_classes": ["Habit"] }],
   "triggers": { "crons": ["17 4 * * *"] },
   "observability": { "enabled": true }
 }

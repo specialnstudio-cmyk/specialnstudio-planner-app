@@ -9,6 +9,9 @@
 // COOKIE_SECRET, ADMIN_SECRET. The Etsy login itself (rotating refresh token) lives in the Gate Durable Object,
 // so only one place ever refreshes it.
 import { DurableObject } from "cloudflare:workers";
+import { habitApi, Habit } from "./habit.js";
+
+export { Habit };
 
 const BASE = "/p/a4c9eafbf1/";
 // Every app folder under BASE is protected. An app opens with an order of one of its listings;
@@ -36,6 +39,7 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     if (url.pathname.startsWith("/__admin/")) return admin(req, env, url);
+    if (url.pathname.startsWith("/takip/api/")) return habitApi(req, env, url);
     const m = url.pathname.startsWith(BASE) && url.pathname.slice(BASE.length).match(/^([a-z0-9-]+)(\/.*)?$/);
     const app = m && m[1];
     if (!app || OPEN_FILES.test(url.pathname)) return env.ASSETS.fetch(req);
