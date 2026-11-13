@@ -1,7 +1,7 @@
 // Habit tracker ("Günlük Takip", static files in /takip/): reminders by Web Push.
 //
 // The app keeps its data on the phone. It sends here only what a reminder needs: the push subscription, the time zone,
-// the day's reminder slots (time, text, which check-ins each covers) and which check-ins are already answered.
+// the day's reminder slots (time, kind, which check-ins each covers, as random ids) and which check-ins are already answered.
 // The app opens only with an access code (see habit()).
 // Each phone gets its own Habit Durable Object (named by a random id the phone made up), which holds that record and its
 // own VAPID key pair, and wakes itself with an alarm at the next slot. A slot whose check-ins are all answered is skipped.
@@ -13,6 +13,14 @@ const ROOT = "/takip/";
 const API = "/takip/api/";
 const CONTACT = "https://specialnstudio-planner.specialnstudio.workers.dev/takip/";  // VAPID "sub"
 const MAX_SLOTS = 24;
+// Reminder texts are fixed here; the app only says which kind a slot is. Nothing the user typed (topic names) is stored.
+const TEXTS = {
+  ask: ["⚡ Şimdiye kadar nasılsın?", "{n} soru seni bekliyor. Dokun, işaretle, barın dolsun."],
+  do: ["✅ Tik zamanı", "Sıradaki adımın tamamsa dokun, tik at, barın dolsun."],
+  close: ["🌙 Günü kapatma zamanı", "Son tikleri at, bugünü %100 kapat."],
+  goal: ["🎯 Hedef tamam!", "Saat hedefini tutturdun. Bravo!"],
+  report: ["📄 3 günlük raporun hazır", "Dokun, raporunu hazırla ve paylaş."],
+};
 const OPEN_FILES = /^\/takip\/(manifest\.webmanifest|icon-512\.png|zebra\.svg|sun\.svg)$/;  // the home-screen icon and the login page's art
 const MAX_DEVICES = 3;  // browsers one access code can open (on an iPhone, Safari and the home-screen app count as two)
 const COOKIE_DAYS = 3 * 365;
@@ -131,7 +139,7 @@ export class Habit extends DurableObject {
     rec.tz = validTz(b.tz) ? b.tz : "Europe/Istanbul";
     rec.slots = (Array.isArray(b.slots) ? b.slots : []).slice(0, MAX_SLOTS)
       .filter(x => x && /^\d\d:\d\d$/.test(x.time))
-      .map(x => ({ time: x.time, title: String(x.title || "").slice(0, 80), body: String(x.body || "").slice(0, 200),
+      .map(x => ({ time: x.time, kind: TEXTS[x.kind] ? x.kind : "ask",
                    items: (Array.isArray(x.items) ? x.items : []).slice(0, 20).map(i => String(i).slice(0, 60)),
                    // a slot that comes round only every N days, counted from a start date (the report reminder)
                    every: Math.min(Math.max(parseInt(x.every) || 1, 1), 60), from: /^\d{4}-\d\d-\d\d$/.test(x.from) ? x.from : "",
@@ -165,9 +173,11 @@ export class Habit extends DurableObject {
       if (minutes(now.time) - minutes(slot.time) > 20 || slot.items.every(i => answered.includes(i))) continue;
       if (slot.on && slot.on !== now.date) continue;
       if (slot.every > 1 && (!slot.from || days(slot.from, now.date) < 1 || days(slot.from, now.date) % slot.every)) continue;
-      const status = await this.push(rec.sub, { title: slot.title, body: slot.body, tag: "slot-" + slot.time });
+      const text = TEXTS[slot.kind] || TEXTS.ask;
+      const status = await this.push(rec.sub, { title: text[0], body: text[1].replace("{n}", slot.items.length), tag: "slot-" + slot.time });
       if (status === 404 || status === 410) { rec.sub = null; break; }  // the phone dropped the subscription
     }
+    for (const slot of rec.slots) { delete slot.title; delete slot.body; }  // texts an older app version sent
     await s.put("rec", rec);
     await this.schedule(rec);
   }
