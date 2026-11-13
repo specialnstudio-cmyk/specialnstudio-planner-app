@@ -93,6 +93,16 @@ button{cursor:pointer;touch-action:manipulation}
 .badge{width:46px;height:46px;border-radius:50%;border:3px solid var(--ink);background:#fff;display:flex;align-items:center;justify-content:center;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:18px;opacity:.45}
 .badge.on{background:var(--yellow);opacity:1;transform:rotate(-6deg)}
 .shop{display:block;width:max-content;margin:18px auto 0;padding:7px 14px;border-radius:999px;background:var(--ink);color:var(--cream);font-size:13px;font-weight:700;letter-spacing:.14em;text-decoration:none}
+.promo{display:flex;align-items:center;gap:12px;margin:18px 14px 0;padding:12px 14px;background:var(--yellow);color:var(--ink);text-decoration:none}
+.promo img{flex:none;width:56px;height:56px;background:var(--cream);border:3px solid var(--ink);border-radius:50%}
+.promo b{display:block;font-size:24px}
+.promo span{font-size:13px;line-height:1.25;display:block;margin-top:2px}
+.promo em{margin-left:auto;font-style:normal;font-size:24px}
+.brag{grid-column:1/-1;margin-top:10px;min-height:48px;font-size:16px;box-shadow:3px 3px 0 var(--ink)}
+.prev{display:block;max-width:100%;max-height:46dvh;margin:0 auto 4px;border:3px solid var(--ink);border-radius:12px}
+.rep{margin:16px 14px 0;width:calc(100% - 28px);text-align:left;background:var(--green);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.rep b{font-size:24px;display:block}.rep span{font-size:14px}.rep em{margin-left:auto;font-style:normal;font-size:26px}
+.kind{margin:0 0 8px;border:2px solid var(--ink);border-radius:10px;background:var(--cream);font-weight:700;min-height:40px;padding:0 12px;width:100%;text-align:left}
 .foot{text-align:center;margin:22px 14px 0;font-size:20px;color:var(--pink)}
 
 /* sheets */
@@ -149,6 +159,7 @@ function fresh() {
 let S;
 try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { /* first run */ }
 if (!S || !S.habits) S = fresh();
+if (!S.reportFrom) { S.reportFrom = iso(new Date()); localStorage.setItem(KEY, JSON.stringify(S)); }
 function save() { localStorage.setItem(KEY, JSON.stringify(S)); sync(); }
 
 // ---------- dates ----------
@@ -193,7 +204,8 @@ function render() {
     <div class="title"><b class="display">${sel === t ? 'Bugün' : esc(LONGDAYS[d.getDay()])}</b><span class="hand">${d.getDate()} ${MONTHS[d.getMonth()]}</span></div></div>
     <div class="card hero"><img class="sun" src="sun.svg" alt="" style="transform:scale(${(0.72 + 0.28 * p).toFixed(2)});filter:saturate(${(0.25 + 0.75 * p).toFixed(2)})">
       <div><div class="pct display">${pctText(p)}<small>%</small></div><div class="say hand">${cheer(p, sel)}</div></div>
-      <div class="bar"><i style="width:${p * 100}%;--c:var(--pink)"></i></div></div>`;
+      <div class="bar"><i style="width:${p * 100}%;--c:var(--pink)"></i></div>
+      ${sel === t && p > 0.999 ? '<button class="btn pink brag" id="brag">Başarını paylaş 📸</button>' : ''}</div>`;
   h += `<div class="week"><button class="nav" data-week="-1" aria-label="Önceki hafta">‹</button>`;
   for (let i = 0; i < 7; i++) {
     const day = addDays(mon, i), dp = dayPct(day);
@@ -202,6 +214,7 @@ function render() {
   }
   h += `<button class="nav" data-week="1" aria-label="Sonraki hafta" ${addDays(mon, 7) > t ? 'disabled' : ''}>›</button></div>`;
   if (pend.length) h += `<button class="card ask" id="ask"><div><b class="display">Şimdiye kadar nasılsın?</b><span>${pend.length} soru seni bekliyor, cevapla, barın dolsun</span></div><em>→</em></button>`;
+  if (sel === t && reportDue()) h += `<button class="card rep" id="rep"><div><b class="display">3 günlük rapor hazır</b><span>PDF olarak koçuna WhatsApp'tan gönder</span></div><em>📄</em></button>`;
   for (const hb of S.habits) {
     const hp = habitPct(sel, hb), slip = hb.steps.some(st => ans(sel, hb, st) === 'slip'), light = LIGHT.includes(hb.color);
     h += `<div class="card habit" style="--c:${hb.color}"><div class="hd"><span class="em">${esc(hb.emoji)}</span><h2 class="display">${esc(hb.name)}</h2><span class="p display">${pctText(hp)}%</span></div>
@@ -219,7 +232,7 @@ function render() {
     <div class="g"><div class="l"><span>🔥 Seri: sıradaki hedef ${next} gün</span><b>${Math.min(s, next)}/${next}</b></div><div class="bar"><i style="width:${Math.min(s / next, 1) * 100}%;--c:var(--orange)"></i></div></div>
     <div class="g"><div class="l"><span>⭐ Bu hafta ${WEEK_GOAL} gün %100</span><b>${Math.min(wk, WEEK_GOAL)}/${WEEK_GOAL}</b></div><div class="bar"><i style="width:${Math.min(wk / WEEK_GOAL, 1) * 100}%;--c:var(--green)"></i></div></div>
     <div class="badges">${GOALS.map(g => `<span class="badge${b >= g ? ' on' : ''}" title="${g} günlük seri">${g}</span>`).join('')}</div></div>
-    <p class="foot hand">${b ? `En uzun serin: ${b} gün` : 'İlk %100 günün ilk rozetini açar'}</p><a class="shop" href="https://www.etsy.com/shop/SpecialNStudio?section_id=60970601" target="_blank" rel="noopener">SPECIALNSTUDIO</a>`;
+    <p class="foot hand">${b ? `En uzun serin: ${b} gün` : 'İlk %100 günün ilk rozetini açar'}</p><a class="card promo" href="https://www.etsy.com/shop/SpecialNStudio?section_id=60970601" target="_blank" rel="noopener"><img src="sun.svg" alt=""><div><b class="display">Chase Your Energy</b><span>Bu takibin renkli planlayıcıları SpecialNStudio'da. Göz at!</span></div><em>→</em></a><a class="shop" href="https://www.etsy.com/shop/SpecialNStudio?section_id=60970601" target="_blank" rel="noopener">SPECIALNSTUDIO</a>`;
   document.getElementById('app').innerHTML = h;
 }
 
@@ -227,6 +240,8 @@ document.getElementById('app').addEventListener('click', e => {
   const el = e.target.closest('button'); if (!el) return;
   if (el.id === 'gear') return settings();
   if (el.id === 'ask') return checkin();
+  if (el.id === 'brag') return brag();
+  if (el.id === 'rep') return report();
   if (el.dataset.week) { const n = addDays(sel, 7 * el.dataset.week); sel = n > today() ? today() : n; return render(); }
   if (el.dataset.day) { sel = el.dataset.day; return render(); }
   if (el.dataset.h) {
@@ -261,7 +276,7 @@ function ask(queue, date, i = 0) {
     } else ask(queue, date, i + 1);
   });
 }
-function checkin() { const p = pending(); sel = today(); render(); if (p.length) ask(p, today()); else toast('Şu an bekleyen soru yok ☀️'); }
+function checkin() { const p = pending(); sel = today(); render(); if (p.length) ask(p, today()); else if (reportDue()) report(); else toast('Şu an bekleyen soru yok ☀️'); }
 
 function party() {
   toast('BUGÜN %100! 🎉 Enerji sende!');
@@ -271,6 +286,103 @@ function party() {
     c.style.cssText = `left:${Math.random() * 100}vw;background:${cols[i % 6]};animation-duration:${1.6 + Math.random() * 1.8}s;animation-delay:${Math.random() * 0.5}s;border-radius:${i % 3 ? 2 : 9}px`;
     document.body.appendChild(c); setTimeout(() => c.remove(), 4200);
   }
+}
+
+// ---------- share card (1080x1920, for stories) ----------
+async function brag() {
+  const W = 1080, H = 1920, c = document.createElement('canvas'), x = c.getContext('2d'), s = streak();
+  c.width = W; c.height = H;
+  const img = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src; });
+  const [zeb, sun] = await Promise.all([img('zebra.svg'), img('sun.svg')]);
+  try { await document.fonts.load("900 100px 'Big Shoulders Display'"); await document.fonts.load("100px 'Caveat Brush'"); } catch (e) { /* system fonts */ }
+  x.fillStyle = '#2348C8'; x.fillRect(0, 0, W, H);
+  if (zeb) x.drawImage(zeb, (W - H * 8 / 3) / 2, 0, H * 8 / 3, H);
+  const box = (bx, by, bw, bh, r, fill) => { x.fillStyle = '#2A1630'; x.beginPath(); x.roundRect(bx + 14, by + 14, bw, bh, r); x.fill();
+    x.fillStyle = fill; x.beginPath(); x.roundRect(bx, by, bw, bh, r); x.fill(); x.lineWidth = 9; x.strokeStyle = '#2A1630'; x.stroke(); };
+  box(90, 330, 900, 1180, 70, '#FFC93C');
+  x.fillStyle = '#FFF6E9'; x.beginPath(); x.arc(540, 610, 200, 0, 7); x.fill(); x.stroke();
+  if (sun) x.drawImage(sun, 345, 415, 390, 390);
+  x.textAlign = 'center'; x.fillStyle = '#2A1630';
+  x.font = "900 150px 'Big Shoulders Display', 'Arial Narrow', sans-serif"; x.fillText('BUGÜN', 540, 985);
+  x.font = "900 300px 'Big Shoulders Display', 'Arial Narrow', sans-serif"; x.fillStyle = '#FF3E8A'; x.fillText('%100', 540, 1245);
+  x.font = "76px 'Caveat Brush', cursive"; x.fillStyle = '#2A1630';
+  x.fillText(s > 1 ? `${s} gündür seri bozulmadı!` : 'Enerji bende!', 540, 1335);
+  x.font = "700 34px 'Space Grotesk', sans-serif"; S.habits.slice(0, 3).forEach((h, i) => x.fillText('✓ ' + h.name, 540, 1400 + i * 42, 800));
+  box(240, 1610, 600, 110, 55, '#2A1630');
+  x.fillStyle = '#FFF6E9'; x.font = "700 44px 'Space Grotesk', sans-serif"; x.fillText('S P E C I A L N S T U D I O', 540, 1681, 540);
+  x.fillStyle = '#FFF6E9'; x.font = "64px 'Caveat Brush', cursive"; x.fillText('Chase Your Energy · Etsy', 540, 1810);
+  const url = c.toDataURL('image/png');
+  offer(new File([bytes(url)], 'bugun-100.png', { type: 'image/png' }), url, 'Başarı kartın hazır', 'Hikâyende ya da mesajda paylaş.');
+}
+
+// ---------- 3-day report (PDF) ----------
+function hm(m) { return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); }
+function gap(a, b) { return Math.round((parse(b) - parse(a)) / 86400000); }
+function reportDue() { return gap(S.lastReport || S.reportFrom, today()) >= 3; }
+function bytes(dataUrl) { return Uint8Array.from(atob(dataUrl.split(',')[1]), ch => ch.charCodeAt(0)); }
+async function report() {
+  const W = 1240, H = 1754, c = document.createElement('canvas'), x = c.getContext('2d'), t = today();
+  c.width = W; c.height = H;
+  try { await document.fonts.load("900 100px 'Big Shoulders Display'"); await document.fonts.load("100px 'Caveat Brush'"); await document.fonts.load("700 30px 'Space Grotesk'"); } catch (e) { /* system fonts */ }
+  const D = "'Big Shoulders Display', 'Arial Narrow', sans-serif", G = "'Space Grotesk', sans-serif";
+  const dates = [3, 2, 1].map(n => addDays(t, -n)), nm = d => `${parse(d).getDate()} ${MONTHS[parse(d).getMonth()]}`;
+  x.fillStyle = '#FFF6E9'; x.fillRect(0, 0, W, H);
+  x.fillStyle = '#2348C8'; x.fillRect(0, 0, W, 250); x.fillStyle = '#FF3E8A'; x.fillRect(0, 250, W, 14);
+  x.fillStyle = '#FFF6E9'; x.font = `900 104px ${D}`; x.fillText('3 GÜNLÜK TAKİP RAPORU', 70, 150);
+  x.font = `700 34px ${G}`; x.fillText(`${nm(dates[0])} – ${nm(dates[2])} ${parse(dates[2]).getFullYear()}`, 72, 210);
+  const avg = dates.reduce((n, d) => n + dayPct(d), 0) / 3;
+  x.fillStyle = '#2A1630'; x.font = `900 170px ${D}`; x.fillText(`%${pctText(avg)}`, 70, 440);
+  x.font = `700 32px ${G}`; x.fillText('3 günün ortalaması', 74, 490);
+  x.textAlign = 'right'; x.font = `900 80px ${D}`; x.fillText(`${streak()} GÜN SERİ`, W - 70, 400);
+  x.font = `700 32px ${G}`; x.fillText(`%100 gün: ${dates.filter(full).length}/3`, W - 70, 455); x.textAlign = 'left';
+  let y = 560;
+  const rr = (bx, by, bw, bh, r, fill, stroke) => { x.beginPath(); x.roundRect(bx, by, bw, bh, r); if (fill) { x.fillStyle = fill; x.fill(); } if (stroke) { x.lineWidth = 5; x.strokeStyle = '#2A1630'; x.stroke(); } };
+  for (const hb of S.habits.slice(0, 6)) {
+    const rows = 78 + 62 * 3 + 20;
+    rr(60, y, W - 120, rows, 26, '#FFFFFF', true);
+    let ok = 0, all = 0, slip = 0;
+    for (const d of dates) for (const st of hb.steps) { all++; const a = ans(d, hb, st); if (a === 'ok') ok++; if (a === 'slip') slip++; }
+    x.fillStyle = '#2A1630'; x.font = `900 52px ${D}`; x.fillText(hb.name.toLocaleUpperCase('tr'), 92, y + 62, 760);
+    x.textAlign = 'right'; x.fillText(`%${all ? Math.round(ok / all * 100) : 0}${slip ? `  ·  ${slip} kaçamak` : ''}`, W - 92, y + 62); x.textAlign = 'left';
+    dates.forEach((d, i) => {
+      const ry = y + 86 + i * 62, n = hb.steps.length, bw = (W - 184 - 250 - (n - 1) * 10) / n;
+      x.fillStyle = '#2A1630'; x.font = `700 28px ${G}`; x.fillText(`${LONGDAYS[parse(d).getDay()]} ${parse(d).getDate()}`, 92, ry + 34);
+      hb.steps.forEach((st, j) => {
+        const a = ans(d, hb, st), bx = 92 + 250 + j * (bw + 10);
+        rr(bx, ry, bw, 46, 12, a === 'ok' ? hb.color : a === 'slip' ? '#D9CFD6' : '#FFFFFF', true);
+        x.fillStyle = a === 'ok' && !LIGHT.includes(hb.color) ? '#FFFFFF' : '#2A1630'; x.font = `700 22px ${G}`; x.textAlign = 'center';
+        x.fillText(`${a === 'ok' ? '✓' : a === 'slip' ? '✕' : '–'} ${st.label}`, bx + bw / 2, ry + 31, bw - 12); x.textAlign = 'left';
+      });
+    });
+    y += rows + 26;
+  }
+  x.fillStyle = '#2A1630'; x.font = `500 24px ${G}`; x.fillText('✓ tamam   ✕ kaçamak   – cevaplanmadı', 62, Math.min(y + 20, H - 110));
+  rr(0, H - 80, W, 80, 0, '#2A1630'); x.fillStyle = '#FFF6E9'; x.font = `700 28px ${G}`; x.textAlign = 'center';
+  x.fillText('GÜNLÜK TAKİP  ·  CHASE YOUR ENERGY  ·  SPECIALNSTUDIO  ·  etsy.com/shop/SpecialNStudio', W / 2, H - 30, W - 80);
+  const jpg = bytes(c.toDataURL('image/jpeg', 0.9)), enc = new TextEncoder(), parts = [], offs = [];
+  let len = 0; const put = v => { const b = typeof v === 'string' ? enc.encode(v) : v; parts.push(b); len += b.length; };
+  const obj = (n, body) => { offs[n] = len; put(`${n} 0 obj\n${body}\nendobj\n`); };
+  put('%PDF-1.4\n');
+  obj(1, '<< /Type /Catalog /Pages 2 0 R >>'); obj(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+  obj(3, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /XObject << /Im0 5 0 R >> >> /Contents 4 0 R >>');
+  const cs = 'q 595 0 0 842 0 0 cm /Im0 Do Q'; obj(4, `<< /Length ${cs.length} >>\nstream\n${cs}\nendstream`);
+  offs[5] = len; put(`5 0 obj\n<< /Type /XObject /Subtype /Image /Width ${W} /Height ${H} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpg.length} >>\nstream\n`); put(jpg); put('\nendstream\nendobj\n');
+  const xref = len; put(`xref\n0 6\n0000000000 65535 f \n${[1, 2, 3, 4, 5].map(n => String(offs[n]).padStart(10, '0') + ' 00000 n \n').join('')}trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+  offer(new File(parts, `takip-raporu-${dates[2]}.pdf`, { type: 'application/pdf' }), c.toDataURL('image/jpeg', 0.6), '3 günlük raporun hazır',
+    'Paylaş\'a dokun, WhatsApp\'ı ve koçunu seç.', () => { S.lastReport = today(); save(); render(); });
+}
+
+// a prepared file, shared from its own button (phones only allow sharing straight from a tap)
+function offer(file, preview, title, sub, done) {
+  const can = navigator.canShare && navigator.canShare({ files: [file] });
+  sheet(`<h3 class="display">${title}</h3><p class="sub">${sub}</p><img class="prev" src="${preview}" alt="">
+    ${can ? '<button class="btn yes" data-a="send">Paylaş 📤</button>' : ''}<button class="btn" data-a="save">İndir</button><button class="btn flat" data-a="x">Kapat</button>`, async a => {
+    if (a === 'x') return closeSheet();
+    if (a === 'send') { try { await navigator.share({ files: [file] }); } catch (e) { return; } }
+    else { const l = document.createElement('a'); l.href = URL.createObjectURL(file); l.download = file.name; l.click(); toast('İndirildi'); }
+    if (done) done();
+    closeSheet();
+  });
 }
 
 // ---------- sheet + toast ----------
@@ -299,7 +411,7 @@ function settings() {
   else push = `<p>Gün içinde "şimdiye kadar nasılsın?" diye sormam için bildirimleri aç.</p><button class="btn pink" data-a="pushon">Bildirimleri aç 🔔</button>`;
   let hs = '';
   S.habits.forEach((hb, i) => {
-    hs += `<div class="set"><h4>${i + 1}. konu · ${hb.kind === 'do' ? 'yapılacak' : 'uzak durulacak'}</h4>
+    hs += `<div class="set"><h4>${i + 1}. konu</h4><button class="kind" data-a="kind" data-i="${i}">Tür: ${hb.kind === 'do' ? '✅ Yapılacak (yaptın mı?)' : '🚫 Uzak durulacak (tükettin mi?)'} · değiştir</button>
       <div class="hname"><input type="text" value="${esc(hb.emoji)}" data-f="emoji" data-i="${i}" aria-label="Simge" maxlength="4">
       <input type="text" value="${esc(hb.name)}" data-f="name" data-i="${i}" aria-label="Konu adı" maxlength="40"></div>
       ${hb.steps.map((st, j) => `<div class="stp"><input value="${esc(st.label)}" data-f="label" data-i="${i}" data-j="${j}" aria-label="Adım adı" maxlength="24">
@@ -308,13 +420,15 @@ function settings() {
   });
   sheet(`<h3 class="display">Ayarlar</h3><p class="sub">Konuları, adımları ve hatırlatma saatlerini buradan değiştir.</p>
     <div class="set"><h4>🔔 Hatırlatmalar</h4>${push}</div>${hs}
-    <div class="set"><h4>📤 Koçuna gönder</h4><p>Bu haftanın özetini mesaj olarak paylaş.</p><button class="btn" data-a="share">Haftalık özeti paylaş</button></div>
+    <div class="set"><h4>📤 Koçuna gönder</h4><p>Her 3 günde bir rapor hatırlatması gelir. Raporu PDF olarak WhatsApp'tan gönderebilirsin.</p><button class="btn" data-a="report">3 günlük PDF raporu</button><button class="btn" data-a="share">Haftalık özeti mesaj olarak paylaş</button></div>
     <button class="btn yes" data-a="close">Tamam</button>`, async (a, b) => {
     const i = +b.dataset.i, j = +b.dataset.j;
     if (a === 'close') return closeSheet();
     if (a === 'add') { S.habits[i].steps.push({ id: rid(), label: 'Yeni adım', time: '18:00' }); save(); render(); return settings(); }
     if (a === 'del') { if (S.habits[i].steps.length < 2) return toast('En az bir adım kalmalı'); S.habits[i].steps.splice(j, 1); save(); render(); return settings(); }
+    if (a === 'kind') { S.habits[i].kind = S.habits[i].kind === 'do' ? 'avoid' : 'do'; save(); render(); return settings(); }
     if (a === 'share') return share();
+    if (a === 'report') return report();
     if (a === 'pushon') { await pushOn(); return settings(); }
     if (a === 'pushoff') { await pushOff(); return settings(); }
     if (a === 'test') { const r = await api('test'); toast(r && r.ok ? 'Gönderildi, birazdan gelir 🔔' : 'Gönderilemedi, bildirimleri kapatıp yeniden aç'); }
@@ -339,7 +453,7 @@ function share() {
     for (let i = 0; i < 7; i++) { const d = addDays(mon, i); if (d > today()) break; for (const st of hb.steps) { all++; const a = ans(d, hb, st); if (a === 'ok') ok++; if (a === 'slip') slip++; } }
     txt += `${hb.emoji} ${hb.name}: %${all ? Math.round(ok / all * 100) : 0}${slip ? ` (${slip} kaçamak)` : ''}\n`;
   }
-  txt += `\n🔥 Seri: ${streak()} gün`;
+  txt += `\n🔥 Seri: ${streak()} gün\n\nGünlük Takip · Chase Your Energy, SpecialNStudio\nhttps://www.etsy.com/shop/SpecialNStudio?section_id=60970601`;
   if (navigator.share) navigator.share({ text: txt }).catch(() => {});
   else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(() => toast('Özet kopyalandı, mesaja yapıştır'));
 }
@@ -349,7 +463,7 @@ function slots() {
   const by = {};
   for (const hb of S.habits) for (const st of hb.steps) (by[st.time] = by[st.time] || []).push([hb, st]);
   const times = Object.keys(by).sort();
-  return times.map((time, n) => {
+  const out = times.map((time, n) => {
     const list = by[time], dos = list.filter(x => x[0].kind === 'do'), av = list.filter(x => x[0].kind !== 'do');
     const names = l => l.map(x => x[0].name).join(', ');
     let title, body;
@@ -358,6 +472,9 @@ function slots() {
     else { title = '⚡ Şimdiye kadar nasılsın?'; body = `${names(av)}: tüketmediysen ilerlemen artıyor.${dos.length ? ` Bir de: ${names(dos)}.` : ''} Dokun, işaretle.`; }
     return { time, title, body, items: list.map(x => key(x[0], x[1])) };
   });
+  let rt = 10 * 60; while (by[hm(rt)]) rt++;
+  out.push({ time: hm(rt), title: '📄 3 günlük raporun hazır', body: 'Dokun, PDF raporunu koçuna WhatsApp\'tan gönder.', items: ['report'], every: 3, from: S.reportFrom });
+  return out;
 }
 async function api(action, body) {
   try { const r = await fetch(API + S.uid + '/' + action, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body || {}) }); return await r.json(); }
@@ -369,7 +486,7 @@ async function doSync() {
   if (!S.push || !canPush) return;
   const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription();
   await api('sync', { sub: sub ? sub.toJSON() : null, tz: Intl.DateTimeFormat().resolvedOptions().timeZone, slots: slots(),
-    answered: { date: today(), ids: Object.keys(S.days[today()] || {}) } });
+    answered: { date: today(), ids: Object.keys(S.days[today()] || {}).concat(S.lastReport === today() ? ['report'] : []) } });
 }
 function b64u(s) { return Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0)); }
 async function pushOn() {
@@ -405,7 +522,7 @@ if (/[?&]c=1/.test(location.search)) { history.replaceState(null, '', './'); che
 else if (!S.welcomed) {
   S.welcomed = true; localStorage.setItem(KEY, JSON.stringify(S));
   sheet(`<h3 class="display">Hoş geldin!</h3><p class="sub">Üç konu, her gün tek hedef: <b>%100</b>.</p>
-    <div class="set"><p>☀️ Her adımı cevapladıkça barların dolar, güneş parlar.</p><p>⚡ Gün içinde "şimdiye kadar nasılsın?" diye sorarım. Tüketmediysen ilerlemen artar.</p><p>🔥 %100 günler seriyi büyütür, rozetleri açar.</p></div>
-    <button class="btn pink" data-a="go">Hatırlatmaları kur 🔔</button><button class="btn flat" data-a="x">Sonra</button>`, a => { if (a === 'go') settings(); else closeSheet(); });
+    <div class="set"><p>☀️ Her adımı cevapladıkça barların dolar, güneş parlar.</p><p>⚡ Gün içinde "şimdiye kadar nasılsın?" diye sorarım. Tüketmediysen ilerlemen artar.</p><p>🔥 %100 günler seriyi büyütür, rozetleri açar.</p><p>✏️ Hazır üç konu örnek. Ayarlar'dan kendi konularını, adımlarını ve saatlerini yaz.</p></div>
+    <button class="btn pink" data-a="go">Konularımı ve hatırlatmaları kur 🔔</button><button class="btn flat" data-a="x">Sonra</button>`, a => { if (a === 'go') settings(); else closeSheet(); });
 }
 </script></body></html>
