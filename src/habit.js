@@ -73,11 +73,12 @@ h1{font-family:'Big Shoulders Display',sans-serif;font-weight:900;text-transform
 p{margin:0 0 14px;font-size:15px}.h{font-family:'Caveat Brush',cursive;font-size:22px;color:#E0177E}
 input{width:100%;border:3px solid #2A1630;border-radius:14px;padding:14px 10px;font:700 22px 'Space Grotesk',monospace;text-align:center;letter-spacing:.08em;text-transform:uppercase;background:#fff;color:#2A1630}
 button{width:100%;margin-top:12px;min-height:56px;border:3px solid #2A1630;border-radius:16px;background:#FF3E8A;color:#fff;font:700 18px 'Space Grotesk',sans-serif;box-shadow:4px 4px 0 #2A1630}
+.s{display:inline-block;margin-top:16px;padding:7px 14px;border-radius:999px;background:#2A1630;color:#FFF6E9;font-size:13px;font-weight:700;letter-spacing:.14em;text-decoration:none}
 .e{background:#fff;border:3px solid #2A1630;border-radius:12px;padding:10px;font-weight:700;font-size:14px}</style></head><body>
 <form method="post" action="__giris"><img src="sun.svg" alt=""><h1>Günlük Takip</h1><p class="h">Her gün %100'e!</p>
 ${msg ? `<p class="e">${msg}</p>` : "<p>Başlamak için sana verilen şifreyi yaz.</p>"}
 <input name="sifre" value="${esc(shown)}" placeholder="XXXXX-XXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="24" required aria-label="Şifre">
-<button>Aç ⚡</button></form></body></html>`, { status, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
+<button>Aç ⚡</button><a class="s" href="https://www.etsy.com/shop/SpecialNStudio?section_id=60970601" target="_blank" rel="noopener">SPECIALNSTUDIO</a></form></body></html>`, { status, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
 }
 
 async function habitApi(req, env, url) {
