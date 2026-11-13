@@ -132,7 +132,9 @@ export class Habit extends DurableObject {
     rec.slots = (Array.isArray(b.slots) ? b.slots : []).slice(0, MAX_SLOTS)
       .filter(x => x && /^\d\d:\d\d$/.test(x.time))
       .map(x => ({ time: x.time, title: String(x.title || "").slice(0, 80), body: String(x.body || "").slice(0, 200),
-                   items: (Array.isArray(x.items) ? x.items : []).slice(0, 20).map(i => String(i).slice(0, 60)) }))
+                   items: (Array.isArray(x.items) ? x.items : []).slice(0, 20).map(i => String(i).slice(0, 60)),
+                   // a slot that comes round only every N days, counted from a start date (the report reminder)
+                   every: Math.min(Math.max(parseInt(x.every) || 1, 1), 60), from: /^\d{4}-\d\d-\d\d$/.test(x.from) ? x.from : "" }))
       .sort((a, b2) => a.time < b2.time ? -1 : 1);
     rec.answered = { date: String((b.answered && b.answered.date) || "").slice(0, 10),
                      ids: ((b.answered && Array.isArray(b.answered.ids)) ? b.answered.ids : []).slice(0, 200).map(String) };
@@ -160,6 +162,7 @@ export class Habit extends DurableObject {
       rec.sent.ids.push(slot.time);
       // only a slot that just came due is announced (not one from hours ago), and only if something in it is still open
       if (minutes(now.time) - minutes(slot.time) > 20 || slot.items.every(i => answered.includes(i))) continue;
+      if (slot.every > 1 && (!slot.from || days(slot.from, now.date) < 1 || days(slot.from, now.date) % slot.every)) continue;
       const status = await this.push(rec.sub, { title: slot.title, body: slot.body, tag: "slot-" + slot.time });
       if (status === 404 || status === 410) { rec.sub = null; break; }  // the phone dropped the subscription
     }
@@ -246,5 +249,7 @@ function localNow(tz) {
     hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).formatToParts(new Date()).map(x => [x.type, x.value]));
   return { date: `${p.year}-${p.month}-${p.day}`, time: `${p.hour}:${p.minute}`, sec: +p.second };
 }
+
+function days(a, b) { return Math.round((Date.parse(b) - Date.parse(a)) / 86400000); }
 
 function minutes(t) { return +t.slice(0, 2) * 60 + +t.slice(3); }
